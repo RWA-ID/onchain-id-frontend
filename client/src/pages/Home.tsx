@@ -27,31 +27,31 @@ export default function Home() {
   const cases = [
     {
       icon: Factory,
-      title: "Industrial Logistics",
-      subtitle: "Fleet Management & Access",
-      desc: "Factory robots need to verify their identity to open secure doors, access restricted zones, and log maintenance records. Using ai-robot.eth, every forklift and arm has a unique on-chain ID that access control systems can verify instantly without a central database.",
-      tags: ["Access Control", "Audit Logs", "Maintenance"]
+      title: "Industrial Workforce",
+      subtitle: "Secure Manufacturing",
+      desc: "General-purpose humanoid workers need verified identities to operate on production lines and access restricted zones. Using AI Robot ID, every humanoid unit has a unique on-chain identity that safety systems verify instantly, replacing the need for manual badge scans.",
+      tags: ["Access Control", "Safety Protocols", "Audit Logs"]
     },
     {
-      icon: Truck,
-      title: "Autonomous Delivery",
-      subtitle: "Trustless Handoffs",
-      desc: "A delivery drone lands at a customer's home. How does the customer's smart lock know it's the correct drone? The drone presents its signed identity (drone-123.ai-robot.eth), the lock verifies the manufacturer signature, and opens the secure drop-box.",
-      tags: ["Verification", "Smart Locks", "Delivery"]
+      icon: User,
+      title: "Retail & Hospitality",
+      subtitle: "Customer Interaction",
+      desc: "A humanoid concierge needs to process payments and handle sensitive customer data. With a verified identity, the robot can sign transactions and prove its authorized status to customers, building trust in public-facing roles.",
+      tags: ["Payments", "Trust", "Service"]
     },
     {
       icon: HeartPulse,
-      title: "Medical Robotics",
-      subtitle: "Compliance & Safety",
-      desc: "Surgical robots require strict firmware version control. The registry stores the hash of the approved firmware. Before an operation, the hospital system checks the robot's on-chain identity to ensure it hasn't been tampered with.",
-      tags: ["Healthcare", "Safety", "Compliance"]
+      title: "Healthcare Assistance",
+      subtitle: "Patient Care & Safety",
+      desc: "Humanoid nursing assistants require strict firmware validation before interacting with patients. The registry stores the hash of approved medical firmware, ensuring only compliant and unmodified units are allowed in sensitive hospital wards.",
+      tags: ["Compliance", "Safety", "Medical"]
     },
     {
       icon: HomeIcon,
-      title: "Domestic Assistants",
-      subtitle: "Service Payments",
-      desc: "A home cleaning robot runs out of detergent. Instead of asking the owner, it uses its own wallet (bound to its identity) to order and pay for a refill using USDC, based on the allowance set by the owner.",
-      tags: ["Micro-payments", "autonomy", "Smart Home"]
+      title: "Domestic Service",
+      subtitle: "Household Autonomy",
+      desc: "Your general-purpose humanoid butler needs to buy groceries or pay for repairs. Bound to its identity, it uses its own wallet to handle household expenses securely, based on the strict allowance and policy set by the owner.",
+      tags: ["Micro-payments", "Privacy", "Smart Home"]
     }
   ];
 
