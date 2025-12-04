@@ -99,7 +99,7 @@ export default function Home() {
               <ul className="space-y-4 pt-4">
                 {[
                   "Instant issuance on Base",
-                  "Zero-cost for manufacturers",
+                  "Enterprise Subscription Access",
                   "Cryptographically verifiable",
                   "Wallet-ready metadata"
                 ].map((item, i) => (
