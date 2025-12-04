@@ -10,7 +10,7 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-4 cursor-pointer">
               <Cpu className="w-5 h-5 text-primary" />
               <span className="font-mono font-bold text-lg">
-                ai-robot<span className="text-primary">.eth</span>
+                AI Robot <span className="text-primary">ID</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">

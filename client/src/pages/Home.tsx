@@ -60,7 +60,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             >
-              The decentralized registry standard for robots. Issue unique, verifiable identities under <span className="text-foreground font-mono">ai-robot.eth</span> and enable autonomous economic agency.
+              The decentralized registry standard for robots. Issue unique, verifiable identities via <span className="text-foreground font-mono">AI Robot ID</span> and enable autonomous economic agency.
             </motion.p>
 
             <motion.div 

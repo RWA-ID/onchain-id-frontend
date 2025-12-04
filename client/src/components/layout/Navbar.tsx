@@ -21,7 +21,7 @@ export function Navbar() {
             <Cpu className="w-5 h-5 text-primary" />
           </div>
           <span className="font-mono font-bold text-xl tracking-tight">
-            ai-robot<span className="text-primary">.eth</span>
+            AI Robot <span className="text-primary">ID</span>
           </span>
         </Link>
 
@@ -46,7 +46,7 @@ export function Navbar() {
             DOCS_V1 (SOON)
           </Button>
           <Button className="font-mono text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 rounded-none">
-            CONNECT_WALLET
+            GENERATE_KEY
           </Button>
         </div>
 
@@ -76,7 +76,7 @@ export function Navbar() {
           ))}
           <div className="h-px bg-border my-2" />
           <Button className="w-full font-mono bg-primary text-primary-foreground rounded-none">
-            CONNECT_WALLET
+            GENERATE_KEY
           </Button>
         </div>
       )}
