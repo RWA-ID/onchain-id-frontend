@@ -13,7 +13,7 @@ import {
   User
 } from "lucide-react";
 import heroImage from "@assets/generated_images/dark_cyberpunk_network_of_robotic_nodes_with_glowing_cyan_lines.png";
-import cubeImage from "@assets/generated_images/holographic_data_cube_with_cyan_and_orange_neon_accents.png";
+import robotLineupImage from "@assets/robots_lineup.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -223,8 +223,8 @@ export default function Home() {
         <div className="container px-6 relative z-10 flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2">
             <img 
-              src={cubeImage} 
-              alt="Data Cube" 
+              src={robotLineupImage} 
+              alt="AI Robots with ENS Identities" 
               className="rounded-xl shadow-2xl border border-border/50 opacity-90 hover:opacity-100 transition-opacity"
             />
           </div>
