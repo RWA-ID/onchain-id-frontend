@@ -38,7 +38,7 @@ export default function Home() {
               className="inline-block"
             >
               <span className="px-3 py-1 border border-primary/30 bg-white/80 backdrop-blur-md text-primary text-xs font-mono tracking-widest uppercase rounded-sm shadow-sm">
-                Coming Soon to Base
+                Launching on Base
               </span>
             </motion.div>
             
