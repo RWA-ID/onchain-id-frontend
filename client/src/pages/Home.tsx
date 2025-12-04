@@ -95,7 +95,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium"
+              className="text-xl md:text-2xl text-foreground/90 max-w-3xl mx-auto leading-relaxed font-medium drop-shadow-sm bg-white/40 backdrop-blur-sm py-2 rounded-lg border border-white/50"
             >
               The decentralized registry standard for the next generation of workforce. Issue unique, verifiable identities via the <span className="text-foreground font-mono font-semibold">AI Robot ID</span> <span className="bg-primary text-white px-2 py-0.5 rounded-md font-bold shadow-sm inline-block transform -translate-y-[1px]">API</span>.
             </motion.p>
