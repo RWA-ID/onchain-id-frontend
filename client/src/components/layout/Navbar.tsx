@@ -8,7 +8,6 @@ export function Navbar() {
   const [location] = useLocation();
 
   const links = [
-    { href: "/", label: "Registry" },
     { href: "/about", label: "About" },
     { href: "/use-cases", label: "Use Cases" },
   ];
@@ -46,7 +45,7 @@ export function Navbar() {
             DOCS_V1 (SOON)
           </Button>
           <Button className="font-mono text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 rounded-none">
-            GENERATE_KEY
+            GENERATE API KEY
           </Button>
         </div>
 
@@ -76,7 +75,7 @@ export function Navbar() {
           ))}
           <div className="h-px bg-border my-2" />
           <Button className="w-full font-mono bg-primary text-primary-foreground rounded-none">
-            GENERATE_KEY
+            GENERATE API KEY
           </Button>
         </div>
       )}
