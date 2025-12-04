@@ -8,9 +8,18 @@ export function Navbar() {
   const [location] = useLocation();
 
   const links = [
-    { href: "/about", label: "About" },
-    { href: "/use-cases", label: "Use Cases" },
+    { href: "#about", label: "About" },
+    { href: "#use-cases", label: "Use Cases" },
   ];
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
+    e.preventDefault();
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      setIsOpen(false);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
@@ -27,15 +36,14 @@ export function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
-            <Link 
-              key={link.href} 
+            <a
+              key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary cursor-pointer ${
-                location === link.href ? "text-primary" : "text-muted-foreground"
-              }`}
+              onClick={(e) => handleScroll(e, link.href)}
+              className="text-sm font-medium transition-colors hover:text-primary cursor-pointer text-muted-foreground"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </div>
 
@@ -62,16 +70,14 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
           {links.map((link) => (
-            <Link 
-              key={link.href} 
+            <a
+              key={link.href}
               href={link.href}
-              className={`text-lg font-medium cursor-pointer ${
-                location === link.href ? "text-primary" : "text-muted-foreground"
-              }`}
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => handleScroll(e, link.href)}
+              className="text-lg font-medium cursor-pointer text-muted-foreground hover:text-primary"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
           <div className="h-px bg-border my-2" />
           <Button className="w-full font-mono bg-primary text-primary-foreground rounded-none">

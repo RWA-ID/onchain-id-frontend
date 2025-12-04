@@ -7,15 +7,11 @@ import NotFound from "@/pages/not-found";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Home from "@/pages/Home";
-import About from "@/pages/About";
-import UseCases from "@/pages/UseCases";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
-      <Route path="/use-cases" component={UseCases} />
       <Route component={NotFound} />
     </Switch>
   );
