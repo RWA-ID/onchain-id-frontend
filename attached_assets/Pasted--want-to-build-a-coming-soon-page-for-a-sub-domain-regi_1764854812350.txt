@@ -1,0 +1,101 @@
+ want to build a coming soon page for a  sub domain registry API for Robot Companies to issue robots decentralized identities with the features listed below using the ENS domain ai-robot.eth, make an about us page and use cases including the information below.  Your system supports:  AI-Robot Identity API — Feature List
+🔵 1. Subdomain Issuance
+* Mint unique robot identities under ai-robot.eth
+* Supports human-readable & serialized naming formats
+    * johndoe.ai-robot.eth
+    * brand-model-serial.ai-robot.eth
+    * Custom templates using {variables}
+* Instant issuance on Base
+* Fuse-protected for permanent ownership
+* Zero-cost issuance (manufacturer covers API cost, not gas)
+
+🔵 2. Bulk Minting
+* Register 10,000+ robot IDs in a single API call
+* CSV upload, JSON batch, or ERP system integration
+* Templates for automated naming (factory-friendly)
+* Duplicate detection and collision prevention
+* Bulk error reporting + audit logs
+
+🔵 3. Robot Metadata Management
+Store and update robot identity metadata:
+* Model
+* Serial Number
+* Manufacturer
+* Firmware Version
+* Factory Location
+* Public Key (robot-generated)
+* Capabilities (mobility, sensors, speech, etc.)
+* Profile URL
+* Owner Wallet Address
+ 4. Wallet Binding (Crypto Integration)
+Attach wallets to robot ENS profiles:
+* ETH payment address
+* BTC payment address
+* USDC-compatible address
+* Allows robots to receive:
+    * microtransactions
+    * task payments
+    * subscriptions
+    * service fees
+* Enables robot-to-robot or robot-to-cloud payments
+* Supports key rotation
+
+🔵 5. Identity Retrieval (“First Boot” API)
+Robot can request its own identity:
+
+GET /robot/identity
+Returns:
+* Assigned ENS name
+* Public key / owner
+* Payment endpoints
+* Metadata
+* Permissions
+Perfect for factory provisioning or first power-on.
+
+🔵 6. Manufacturer Whitelisting
+Enterprises can:
+* restrict issuance to specific factories
+* lock identity creation to approved systems
+* manage API keys per production line
+* define custom issuance policies
+
+🔵 7. Reserved Names
+* Reserve namespaces for future production
+* Lock names before robots are built
+* Example: reserve optimus-000001 → optimus-010000
+* Prevents unauthorized or conflicting claims
+
+🔵 8. Ownership Transfer
+API endpoints for:
+* transferring robot identity to new buyers
+* updating wallet associations
+* updating firmware signatures
+* proof-of-transfer flows
+ 🔵 9. Firmware & Attestation Records
+Manufacturers can publish:
+* firmware hash
+* attestation signatures
+* safety certificates
+* regulatory compliance metadata
+Supports robot safety and authenticity verification.
+
+🔵 10. Permissions & Capability Schema
+Set robot behavior policies:
+* movement permissions
+* task restrictions
+* communication endpoints
+* allowed integrations
+* fleet management rules
+Stored in structured metadata formats.
+
+🔵 11. Profile Page Generation
+API powers profile pages visible on AI-Robot.id:
+* robot image
+* name + ENS
+* wallet addresses
+* capabilities
+* metadata
+* manufacturer badge
+* last activity
+* firmware version
+Fully customizable per enterprise.
