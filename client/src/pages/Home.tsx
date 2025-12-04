@@ -12,7 +12,7 @@ import {
   Settings,
   User
 } from "lucide-react";
-import heroImage from "@assets/generated_images/dark_cyberpunk_network_of_robotic_nodes_with_glowing_cyan_lines.png";
+import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
 import robotLineupImage from "@assets/robots_lineup.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,10 +23,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden bg-background">
         {/* Background Image Overlay */}
-        <div className="absolute inset-0 z-0 opacity-40">
-          <img src={heroImage} alt="Network Background" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-background" />
-          <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+        <div className="absolute inset-0 z-0 opacity-90">
+          <img src={heroImage} alt="Robot Factory Background" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-transparent to-white" />
         </div>
 
         <div className="container relative z-10 px-6 pt-20">
@@ -37,7 +37,7 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="inline-block"
             >
-              <span className="px-3 py-1 border border-primary/30 bg-primary/10 text-primary text-xs font-mono tracking-widest uppercase rounded-sm">
+              <span className="px-3 py-1 border border-primary/30 bg-white/80 backdrop-blur-md text-primary text-xs font-mono tracking-widest uppercase rounded-sm shadow-sm">
                 Coming Soon to Base
               </span>
             </motion.div>
@@ -46,11 +46,11 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-white leading-tight"
+              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm"
             >
-              Identity for the <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600 text-glow">
-                Machine Economy
+              Identity for <br />
+              <span className="text-primary">
+                Humanoid Robots
               </span>
             </motion.h1>
 
@@ -58,9 +58,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium"
             >
-              The decentralized registry standard for robots. Issue unique, verifiable identities via <span className="text-foreground font-mono">AI Robot ID</span> and enable autonomous economic agency.
+              The decentralized registry standard for the next generation of workforce. Issue unique, verifiable identities via <span className="text-foreground font-mono font-semibold">AI Robot ID</span>.
             </motion.p>
 
             <motion.div 
@@ -69,11 +69,11 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <div className="flex w-full max-w-sm items-center space-x-2">
+              <div className="flex w-full max-w-sm items-center space-x-2 shadow-lg rounded-sm">
                 <input 
                   type="email" 
                   placeholder="ENTER_EMAIL_FOR_UPDATES" 
-                  className="flex h-12 w-full bg-background/50 border border-border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+                  className="flex h-12 w-full bg-white border border-border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 font-mono"
                 />
                 <Button className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none">
                   NOTIFY_ME
@@ -85,7 +85,7 @@ export default function Home() {
       </section>
 
       {/* Code Terminal Section - First Boot API */}
-      <section className="py-24 border-y border-border/40 bg-card/20 backdrop-blur-sm">
+      <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
         <div className="container px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -104,7 +104,7 @@ export default function Home() {
                   "Wallet-ready metadata"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-mono text-foreground/80">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                     {item}
                   </li>
                 ))}
@@ -112,8 +112,8 @@ export default function Home() {
             </div>
 
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-              <div className="relative rounded-lg border border-border bg-[#0c0c0e] p-6 font-mono text-sm shadow-2xl">
+              <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition duration-1000"></div>
+              <div className="relative rounded-lg border border-border bg-[#1e1e1e] p-6 font-mono text-sm shadow-2xl">
                 <div className="flex gap-2 mb-4 border-b border-white/10 pb-4">
                   <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
@@ -200,9 +200,9 @@ export default function Home() {
                 icon: Settings
               },
             ].map((feature, i) => (
-              <Card key={i} className="bg-card/40 border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,240,255,0.1)] group">
+              <Card key={i} className="bg-white border-border/60 hover:border-primary/50 transition-all duration-300 hover:shadow-lg group">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-display text-xl">{feature.title}</CardTitle>
@@ -219,23 +219,23 @@ export default function Home() {
       </section>
 
       {/* Visual Break / Quote */}
-      <section className="py-24 bg-accent/5 border-y border-border relative overflow-hidden">
+      <section className="py-24 bg-gray-50 border-y border-border relative overflow-hidden">
         <div className="container px-6 relative z-10 flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2">
             <img 
               src={robotLineupImage} 
               alt="AI Robots with ENS Identities" 
-              className="rounded-xl shadow-2xl border border-border/50 opacity-90 hover:opacity-100 transition-opacity"
+              className="rounded-xl shadow-2xl border border-border opacity-95 hover:opacity-100 transition-opacity"
             />
           </div>
           <div className="md:w-1/2 space-y-6">
             <h3 className="text-3xl font-display font-bold leading-tight">
-              "We are building the <span className="text-secondary">DNS for Robots</span>."
+              "We are building the <span className="text-primary">DNS for Robots</span>."
             </h3>
             <p className="text-lg text-muted-foreground">
               As autonomous agents multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. ai-robot.eth provides the global standard for this registry.
             </p>
-            <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-mono mt-4">
+            <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/5 font-mono mt-4 bg-white">
               VIEW_TECHNICAL_PAPER
             </Button>
           </div>
