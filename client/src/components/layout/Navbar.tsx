@@ -53,7 +53,7 @@ export function Navbar() {
             DOCS_V1 (SOON)
           </Button>
           <Button className="font-mono text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 rounded-none">
-            GENERATE API KEY
+            START MINTING
           </Button>
         </div>
 
@@ -81,7 +81,7 @@ export function Navbar() {
           ))}
           <div className="h-px bg-border my-2" />
           <Button className="w-full font-mono bg-primary text-primary-foreground rounded-none">
-            GENERATE API KEY
+            START MINTING
           </Button>
         </div>
       )}

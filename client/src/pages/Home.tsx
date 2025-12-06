@@ -16,12 +16,32 @@ import {
   Home as HomeIcon,
   Shield,
   Zap,
-  Server
+  Server,
+  Upload,
+  CheckCircle,
+  FileSpreadsheet
 } from "lucide-react";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
 import robotLineupImage from "@assets/robots_lineup.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const pricingTiers = [
+  { min: 1,      max: 99,      priceUSD: 0.49 },
+  { min: 100,    max: 999,     priceUSD: 0.19 },
+  { min: 1_000,  max: 9_999,   priceUSD: 0.079 },
+  { min: 10_000, max: 49_999,  priceUSD: 0.049 },
+  { min: 50_000, max: 249_999, priceUSD: 0.029 },
+  { min: 250_000, max: 1_000_000_000, priceUSD: 0.019 }
+];
 
 export default function Home() {
   const cases = [
@@ -36,7 +56,7 @@ export default function Home() {
       icon: User,
       title: "Retail & Hospitality",
       subtitle: "Customer Interaction",
-      desc: "A humanoid concierge needs to process payments and handle sensitive customer data. With a verified identity, the robot can sign transactions and prove its authorized status to customers, building trust in public-facing roles.",
+      desc: "A humanoid concierge needs to process payments and handle sensitive customer data. With a verified identity, the robot can sign transactions and prove their authorized status to customers, building trust in public-facing roles.",
       tags: ["Payments", "Trust", "Service"]
     },
     {
@@ -85,10 +105,10 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm"
             >
-              Identity for <br />
+              Open Bulk Identity <br />
               <span className="text-primary">
-                Humanoid Robots
-              </span>
+                Minting
+              </span> for Humanoid Robots
             </motion.h1>
 
             <motion.p 
@@ -97,7 +117,9 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-lg md:text-xl text-slate-800 max-w-2xl mx-auto leading-relaxed font-medium"
             >
-              The decentralized registry standard for the next generation of workforce. Issue unique, verifiable identities via the <span className="text-foreground font-mono font-semibold">AI Robot ID</span> <span className="bg-primary text-white px-2 py-0.5 rounded-md font-bold shadow-sm inline-block transform -translate-y-[1px]">API</span>.
+              No subscriptions. No hidden fees. Just upload your CSV.
+              <br/>
+              Issue unique, verifiable identities on <span className="font-mono font-bold">robot-id.eth</span> or <span className="font-mono font-bold">machine-id.eth</span> instantly via our bulk minting tool.
             </motion.p>
 
             <motion.div 
@@ -106,42 +128,36 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <div className="flex w-full max-w-sm items-center space-x-2 shadow-lg rounded-sm">
-                <input 
-                  type="email" 
-                  placeholder="ENTER_EMAIL_FOR_UPDATES" 
-                  className="flex h-12 w-full bg-white border border-border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-                />
-                <Button className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none">
-                  NOTIFY_ME
-                </Button>
-              </div>
+              <Button className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg">
+                <Upload className="mr-2 h-4 w-4" />
+                START MINTING
+              </Button>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Code Terminal Section - First Boot API */}
+      {/* Bulk Minting Visualization Section */}
       <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
         <div className="container px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-display font-bold">
-                <span className="text-primary">First Boot</span> Identity Retrieval
+                <span className="text-primary">Bulk Minting</span> Workflow
               </h2>
               <p className="text-muted-foreground text-lg">
-                Robots can autonomously request their own identity upon first power-on. 
-                Our "First Boot" API delivers everything a machine needs to prove its existence and transact on-chain.
+                Register thousands of robot identities in seconds. Simply upload a CSV file with your fleet's details.
+                First come, first serve.
               </p>
               <ul className="space-y-4 pt-4">
                 {[
-                  "Instant issuance on Base",
-                  "Enterprise Subscription Access",
-                  "Cryptographically verifiable",
-                  "Wallet-ready metadata"
+                  "Choose robot-id.eth or machine-id.eth",
+                  "CSV Upload (6 columns)",
+                  "Instant on-chain registration",
+                  "Full ownership & control"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-mono text-foreground/80">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                    <CheckCircle className="w-4 h-4 text-primary" />
                     {item}
                   </li>
                 ))}
@@ -150,32 +166,87 @@ export default function Home() {
 
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition duration-1000"></div>
-              <div className="relative rounded-lg border border-border bg-[#1e1e1e] p-6 font-mono text-sm shadow-2xl">
-                <div className="flex gap-2 mb-4 border-b border-white/10 pb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
+              <div className="relative rounded-lg border border-border bg-white p-6 shadow-2xl overflow-hidden">
+                <div className="flex items-center gap-2 mb-4 text-muted-foreground text-xs font-mono border-b border-border pb-2">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>fleet_manifest_v1.csv</span>
                 </div>
-                <div className="space-y-2 text-green-400/90">
-                  <p className="opacity-50 text-white">$ curl -X GET https://api.ai-robot.id/v1/robot/identity</p>
-                  <p className="text-white/90">{`{`}</p>
-                  <div className="pl-4 space-y-1">
-                    <p><span className="text-purple-400">"ens_name"</span>: <span className="text-yellow-300">"optimus-prime.ai-robot.eth"</span>,</p>
-                    <p><span className="text-purple-400">"owner"</span>: <span className="text-yellow-300">"0x71C...9A21"</span>,</p>
-                    <p><span className="text-purple-400">"manufacturer"</span>: <span className="text-yellow-300">"Tesla Inc."</span>,</p>
-                    <p><span className="text-purple-400">"firmware_hash"</span>: <span className="text-yellow-300">"0xa9b...f2e1"</span>,</p>
-                    <p><span className="text-purple-400">"capabilities"</span>: [</p>
-                    <p className="pl-4"><span className="text-yellow-300">"mobility"</span>, <span className="text-yellow-300">"manipulation"</span>, <span className="text-yellow-300">"vision"</span></p>
-                    <p>],</p>
-                    <p><span className="text-purple-400">"wallet"</span>: <span className="text-yellow-300">"0xB2...11F9"</span></p>
-                  </div>
-                  <p className="text-white/90">{`}`}</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="py-2 px-2 text-primary font-bold">Name</th>
+                        <th className="py-2 px-2 text-muted-foreground">Make</th>
+                        <th className="py-2 px-2 text-muted-foreground">Model</th>
+                        <th className="py-2 px-2 text-muted-foreground">Serial</th>
+                        <th className="py-2 px-2 text-muted-foreground">Website</th>
+                        <th className="py-2 px-2 text-muted-foreground">Social</th>
+                      </tr>
+                    </thead>
+                    <tbody className="opacity-70">
+                      <tr className="border-b border-border/50">
+                        <td className="py-2 px-2 font-bold">optimus-01</td>
+                        <td className="py-2 px-2">Tesla</td>
+                        <td className="py-2 px-2">Gen2</td>
+                        <td className="py-2 px-2">TSL-992</td>
+                        <td className="py-2 px-2">tesla.com</td>
+                        <td className="py-2 px-2">@tesla</td>
+                      </tr>
+                      <tr className="border-b border-border/50">
+                        <td className="py-2 px-2 font-bold">atlas-x9</td>
+                        <td className="py-2 px-2">Boston</td>
+                        <td className="py-2 px-2">Atlas</td>
+                        <td className="py-2 px-2">BD-881</td>
+                        <td className="py-2 px-2">bostondynamics.com</td>
+                        <td className="py-2 px-2">@boston_dyn</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 px-2 font-bold text-muted-foreground italic">...</td>
+                        <td className="py-2 px-2">...</td>
+                        <td className="py-2 px-2">...</td>
+                        <td className="py-2 px-2">...</td>
+                        <td className="py-2 px-2">...</td>
+                        <td className="py-2 px-2">...</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 bg-gray-50 border-y border-border">
+        <div className="container px-6 max-w-5xl mx-auto text-center space-y-12">
+           <div className="space-y-4">
+            <h2 className="text-3xl md:text-5xl font-display font-bold">Transparent Volume Pricing</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Pay only for what you mint. Bulk discounts applied automatically.
+            </p>
+           </div>
+
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {pricingTiers.map((tier, i) => (
+               <Card key={i} className={`border-border transition-all hover:border-primary/50 hover:shadow-lg ${i === 0 ? 'border-primary/50 bg-primary/5' : 'bg-white'}`}>
+                 <CardHeader>
+                   <CardTitle className="font-mono text-lg text-muted-foreground">
+                     {tier.max > 1000000 ? `${tier.min.toLocaleString()}+` : `${tier.min.toLocaleString()} - ${tier.max.toLocaleString()}`} Units
+                   </CardTitle>
+                 </CardHeader>
+                 <CardContent>
+                   <div className="text-4xl font-display font-bold text-foreground mb-2">
+                     ${tier.priceUSD}
+                   </div>
+                   <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest">Per Identity</p>
+                 </CardContent>
+               </Card>
+             ))}
+           </div>
+        </div>
+      </section>
+
 
       {/* Feature Grid */}
       <section className="py-24 bg-background relative">
@@ -193,12 +264,12 @@ export default function Home() {
             {[
               {
                 title: "Subdomain Issuance",
-                desc: "Mint unique robot identities (e.g. model-serial.ai-robot.eth) instantly on Base.",
+                desc: "Choose between robot-id.eth or machine-id.eth for your fleet identities.",
                 icon: Globe
               },
               {
                 title: "Bulk Minting",
-                desc: "Register 10,000+ robot IDs in a single API call via CSV or JSON batch.",
+                desc: "Upload CSV with Name, Make, Model, Serial, Website, and Social columns.",
                 icon: Database
               },
               {
