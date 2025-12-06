@@ -34,6 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { MintCalculator } from "@/components/MintCalculator";
+
 const pricingTiers = [
   { min: 1,      max: 99,      priceUSD: 0.49 },
   { min: 100,    max: 999,     priceUSD: 0.19 },
@@ -227,7 +229,9 @@ export default function Home() {
             </p>
            </div>
 
-           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+           <MintCalculator />
+
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-12">
              {pricingTiers.map((tier, i) => (
                <Card key={i} className={`border-border transition-all hover:border-primary/50 hover:shadow-lg ${i === 0 ? 'border-primary/50 bg-primary/5' : 'bg-white'}`}>
                  <CardHeader>
@@ -304,7 +308,7 @@ export default function Home() {
               },
               {
                 title: "Capability Schema",
-                desc: "Define permission policies for movement, tasks, and API access.",
+                desc: "Define permission policies for movement, tasks, and system access.",
                 icon: Settings
               },
             ].map((feature, i) => (
