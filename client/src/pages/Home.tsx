@@ -36,14 +36,14 @@ import {
 
 import { MintCalculator } from "@/components/MintCalculator";
 
-const pricingTiers = [
-  { min: 1,      max: 99,      priceUSD: 0.49 },
-  { min: 100,    max: 999,     priceUSD: 0.19 },
-  { min: 1_000,  max: 9_999,   priceUSD: 0.079 },
-  { min: 10_000, max: 49_999,  priceUSD: 0.049 },
-  { min: 50_000, max: 249_999, priceUSD: 0.029 },
-  { min: 250_000, max: 1_000_000_000, priceUSD: 0.019 }
-];
+// const pricingTiers = [
+//   { min: 1,      max: 99,      priceUSD: 0.49 },
+//   { min: 100,    max: 999,     priceUSD: 0.19 },
+//   { min: 1_000,  max: 9_999,   priceUSD: 0.079 },
+//   { min: 10_000, max: 49_999,  priceUSD: 0.049 },
+//   { min: 50_000, max: 249_999, priceUSD: 0.029 },
+//   { min: 250_000, max: 1_000_000_000, priceUSD: 0.019 }
+// ];
 
 export default function Home() {
   const cases = [
@@ -223,31 +223,15 @@ export default function Home() {
       <section className="py-24 bg-gray-50 border-y border-border">
         <div className="container px-6 max-w-5xl mx-auto text-center space-y-12">
            <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-display font-bold">Transparent Volume Pricing</h2>
+            <h2 className="text-3xl md:text-5xl font-display font-bold">Launch Promotion Pricing</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Pay only for what you mint. Bulk discounts applied automatically.
+              We've simplified our pricing for the Base mainnet launch. 
+              <br />
+              <span className="text-primary font-bold">0.00003 ETH</span> per identity + Gas. Flat rate.
             </p>
            </div>
 
            <MintCalculator />
-
-           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pt-12">
-             {pricingTiers.map((tier, i) => (
-               <Card key={i} className={`border-border transition-all hover:border-primary/50 hover:shadow-lg ${i === 0 ? 'border-primary/50 bg-primary/5' : 'bg-white'}`}>
-                 <CardHeader>
-                   <CardTitle className="font-mono text-lg text-muted-foreground">
-                     {tier.max > 1000000 ? `${tier.min.toLocaleString()}+` : `${tier.min.toLocaleString()} - ${tier.max.toLocaleString()}`} Units
-                   </CardTitle>
-                 </CardHeader>
-                 <CardContent>
-                   <div className="text-4xl font-display font-bold text-foreground mb-2">
-                     ${tier.priceUSD}
-                   </div>
-                   <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest">Per Identity</p>
-                 </CardContent>
-               </Card>
-             ))}
-           </div>
         </div>
       </section>
 

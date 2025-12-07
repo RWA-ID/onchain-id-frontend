@@ -4,25 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap } from "lucide-react";
 
-const pricingTiers = [
-  { min: 1,      max: 99,      priceUSD: 0.49 },
-  { min: 100,    max: 999,     priceUSD: 0.19 },
-  { min: 1_000,  max: 9_999,   priceUSD: 0.079 },
-  { min: 10_000, max: 49_999,  priceUSD: 0.049 },
-  { min: 50_000, max: 249_999, priceUSD: 0.029 },
-  { min: 250_000, max: 1_000_000_000, priceUSD: 0.019 }
-];
+const PROMO_PRICE_ETH = 0.00003;
 
 export function MintCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
-  const [unitPrice, setUnitPrice] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
   useEffect(() => {
-    // Find the tier that matches the current quantity
-    const tier = pricingTiers.find(t => quantity >= t.min && quantity <= t.max) || pricingTiers[pricingTiers.length - 1];
-    setUnitPrice(tier.priceUSD);
-    setTotalPrice(quantity * tier.priceUSD);
+    setTotalPrice(quantity * PROMO_PRICE_ETH);
   }, [quantity]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,11 +27,6 @@ export function MintCalculator() {
     setQuantity(value[0]);
   };
 
-  // Formatting helper
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-  };
-
   return (
     <Card className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden">
       <CardHeader className="bg-gray-50 border-b border-border pb-8">
@@ -53,7 +37,7 @@ export function MintCalculator() {
           <CardTitle className="font-display text-2xl">Minting Cost Calculator</CardTitle>
         </div>
         <p className="text-muted-foreground text-sm">
-          Estimate the cost of issuing identities for your robot fleet.
+          Estimate the cost of issuing identities during our <span className="font-bold text-primary">Launch Promotion</span>.
         </p>
       </CardHeader>
       <CardContent className="p-8 grid md:grid-cols-2 gap-12">
@@ -92,7 +76,7 @@ export function MintCalculator() {
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
             <Zap className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <p className="text-sm text-blue-900">
-              <span className="font-bold">Pro Tip:</span> Minting in bulk batches of 10,000+ unlocks our efficiency tier at <span className="font-bold">$0.049/unit</span>.
+              <span className="font-bold">Launch Promo:</span> Fixed price of <span className="font-bold">0.00003 ETH</span> per identity for a limited time.
             </p>
           </div>
         </div>
@@ -105,25 +89,26 @@ export function MintCalculator() {
             <p className="text-slate-400 font-mono text-sm uppercase tracking-wider">Estimated Total</p>
             <div className="flex items-baseline gap-1">
               <span className="text-5xl font-display font-bold tracking-tight">
-                {formatCurrency(totalPrice)}
+                {totalPrice.toFixed(5)}
               </span>
+              <span className="text-xl font-medium text-slate-400">ETH</span>
             </div>
           </div>
 
           <div className="relative z-10 space-y-6 mt-8">
             <div className="flex justify-between items-center border-b border-white/10 pb-4">
-              <span className="text-slate-400 text-sm">Unit Price Applied</span>
+              <span className="text-slate-400 text-sm">Unit Price</span>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-1 bg-primary/20 text-primary-foreground text-xs font-bold rounded">
-                  TIER ACTIVE
+                  PROMO
                 </span>
-                <span className="font-mono font-bold text-xl">${unitPrice}</span>
+                <span className="font-mono font-bold text-xl">{PROMO_PRICE_ETH} ETH</span>
               </div>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Gas Fees (Base)</span>
-              <span className="text-green-400 font-mono text-sm">~$0.00 (Sponsored)</span>
+              <span className="text-slate-300 font-mono text-sm">Est. &lt; $0.01</span>
             </div>
           </div>
         </div>
