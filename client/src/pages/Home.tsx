@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table";
 
 import { MintCalculator } from "@/components/MintCalculator";
+import { BulkMintForm } from "@/components/BulkMintForm";
 
 // const pricingTiers = [
 //   { min: 1,      max: 99,      priceUSD: 0.49 },
@@ -232,6 +233,9 @@ export default function Home() {
            </div>
 
            <MintCalculator />
+           <div id="mint-section" className="scroll-mt-24">
+             <BulkMintForm />
+           </div>
         </div>
       </section>
 
