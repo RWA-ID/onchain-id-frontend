@@ -10,6 +10,7 @@ import { parseEther } from "viem";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { ABI } from "@/lib/abi";
 import { useToast } from "@/hooks/use-toast";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface CSVRow {
   name: string;
@@ -111,6 +112,38 @@ export function BulkMintForm() {
       }
     });
   };
+
+  if (!isConnected) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden mt-8" id="mint-interface">
+        <CardHeader className="bg-gray-50 border-b border-border pb-8">
+           <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Database className="w-6 h-6 text-primary" />
+            </div>
+            <CardTitle className="font-display text-2xl">Bulk Minting Interface</CardTitle>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Connect your wallet to access the fleet issuance tools.
+          </p>
+        </CardHeader>
+        <CardContent className="p-16 flex flex-col items-center justify-center text-center space-y-6">
+          <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center animate-pulse">
+            <Database className="w-8 h-8 text-primary/40" />
+          </div>
+          <div className="max-w-md space-y-2">
+            <h3 className="text-xl font-bold">Authentication Required</h3>
+            <p className="text-muted-foreground">
+              Please connect your wallet to upload manifest files and mint identities on Base.
+            </p>
+          </div>
+          <div className="pt-4">
+            <ConnectButton />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden mt-8" id="mint-interface">
