@@ -9,10 +9,28 @@ const PROMO_PRICE_ETH = 0.00003;
 export function MintCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [ethPrice, setEthPrice] = useState<number>(3800); // Default fallback price
 
   useEffect(() => {
     setTotalPrice(quantity * PROMO_PRICE_ETH);
   }, [quantity]);
+
+  useEffect(() => {
+    // Fetch ETH price from CoinGecko
+    const fetchEthPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+        const data = await response.json();
+        if (data.ethereum?.usd) {
+          setEthPrice(data.ethereum.usd);
+        }
+      } catch (error) {
+        console.error('Failed to fetch ETH price:', error);
+      }
+    };
+    
+    fetchEthPrice();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value.replace(/,/g, ''));
@@ -87,11 +105,16 @@ export function MintCalculator() {
           
           <div className="relative z-10 space-y-2">
             <p className="text-slate-400 font-mono text-sm uppercase tracking-wider">Estimated Total</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-display font-bold tracking-tight">
-                {totalPrice.toFixed(5)}
-              </span>
-              <span className="text-xl font-medium text-slate-400">ETH</span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-display font-bold tracking-tight">
+                  {totalPrice.toFixed(5)}
+                </span>
+                <span className="text-xl font-medium text-slate-400">ETH</span>
+              </div>
+              <div className="text-slate-400 font-mono text-sm">
+                ≈ ${(totalPrice * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+              </div>
             </div>
           </div>
 
@@ -102,7 +125,10 @@ export function MintCalculator() {
                 <span className="px-2 py-1 bg-primary/20 text-primary-foreground text-xs font-bold rounded">
                   PROMO
                 </span>
-                <span className="font-mono font-bold text-xl">{PROMO_PRICE_ETH} ETH</span>
+                <div className="text-right">
+                   <div className="font-mono font-bold text-xl leading-none">{PROMO_PRICE_ETH} ETH</div>
+                   <div className="text-[10px] text-slate-400 font-mono mt-1">≈ ${(PROMO_PRICE_ETH * ethPrice).toFixed(2)} USD</div>
+                </div>
               </div>
             </div>
             
