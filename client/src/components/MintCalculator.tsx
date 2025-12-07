@@ -2,18 +2,32 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Calculator, DollarSign, Zap } from "lucide-react";
+import { Calculator, DollarSign, Zap, Fuel } from "lucide-react";
+import { useGasPrice } from "wagmi";
+import { formatEther, formatGwei } from "viem";
 
 const PROMO_PRICE_ETH = 0.00003;
+// Rough estimates for gas usage
+const BASE_GAS = BigInt(100000);
+const GAS_PER_UNIT = BigInt(45000); 
 
 export function MintCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [ethPrice, setEthPrice] = useState<number>(3800); // Default fallback price
+  
+  const { data: gasPrice } = useGasPrice({ chainId: 8453 }); // Base Chain ID
+
+  const [estimatedGasCost, setEstimatedGasCost] = useState<bigint>(BigInt(0));
 
   useEffect(() => {
     setTotalPrice(quantity * PROMO_PRICE_ETH);
-  }, [quantity]);
+    
+    if (gasPrice) {
+      const estimatedGas = BASE_GAS + (GAS_PER_UNIT * BigInt(quantity));
+      setEstimatedGasCost(estimatedGas * gasPrice);
+    }
+  }, [quantity, gasPrice]);
 
   useEffect(() => {
     // Fetch ETH price from CoinGecko
@@ -44,6 +58,9 @@ export function MintCalculator() {
   const handleSliderChange = (value: number[]) => {
     setQuantity(value[0]);
   };
+  
+  const estimatedGasEth = estimatedGasCost ? parseFloat(formatEther(estimatedGasCost)) : 0;
+  const estimatedGasUsd = estimatedGasEth * ethPrice;
 
   return (
     <Card className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden">
@@ -108,12 +125,12 @@ export function MintCalculator() {
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-display font-bold tracking-tight">
-                  {totalPrice.toFixed(5)}
+                  {(totalPrice + estimatedGasEth).toFixed(5)}
                 </span>
                 <span className="text-xl font-medium text-slate-400">ETH</span>
               </div>
               <div className="text-slate-400 font-mono text-sm">
-                ≈ ${(totalPrice * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                ≈ ${((totalPrice + estimatedGasEth) * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
               </div>
             </div>
           </div>
@@ -133,8 +150,19 @@ export function MintCalculator() {
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="text-slate-400 text-sm">Gas Fees (Base)</span>
-              <span className="text-slate-300 font-mono text-sm">Est. &lt; $0.01</span>
+              <span className="text-slate-400 text-sm flex items-center gap-2">
+                <Fuel className="w-4 h-4" />
+                Gas Fees (Base)
+              </span>
+              <div className="text-right">
+                <div className="text-slate-300 font-mono text-sm">
+                  {estimatedGasEth > 0 ? `~${estimatedGasEth.toFixed(6)} ETH` : "Loading..."}
+                </div>
+                 <div className="text-[10px] text-slate-500 font-mono">
+                   {gasPrice ? `${Number(formatGwei(gasPrice)).toFixed(4)} gwei` : "..."} 
+                   {estimatedGasUsd > 0 && ` (~$${estimatedGasUsd.toFixed(2)})`}
+                 </div>
+              </div>
             </div>
           </div>
         </div>
