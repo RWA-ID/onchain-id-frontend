@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { Cpu, Menu, X, Terminal } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,9 +53,11 @@ export function Navbar() {
             <Terminal className="w-3 h-3 mr-2" />
             DOCS_V1 (SOON)
           </Button>
-          <Button className="font-mono text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 rounded-none">
-            START MINTING
-          </Button>
+          <ConnectButton 
+            accountStatus="address" 
+            chainStatus="icon"
+            showBalance={false}
+          />
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -80,9 +83,13 @@ export function Navbar() {
             </a>
           ))}
           <div className="h-px bg-border my-2" />
-          <Button className="w-full font-mono bg-primary text-primary-foreground rounded-none">
-            START MINTING
-          </Button>
+          <div className="flex justify-center">
+             <ConnectButton 
+                accountStatus="address" 
+                chainStatus="icon"
+                showBalance={false}
+              />
+          </div>
         </div>
       )}
     </nav>
