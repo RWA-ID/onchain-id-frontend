@@ -6,6 +6,7 @@ import { Calculator, DollarSign, Zap, Fuel, ArrowRight } from "lucide-react";
 import { useGasPrice } from "wagmi";
 import { formatEther, formatGwei } from "viem";
 import { Button } from "@/components/ui/button";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const PROMO_PRICE_ETH = 0.00003;
 // Rough estimates for gas usage

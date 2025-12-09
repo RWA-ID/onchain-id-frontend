@@ -21,11 +21,10 @@ import {
   CheckCircle,
   FileSpreadsheet
 } from "lucide-react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
-// import robotLineupImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
-// import bulkMintImage from "@assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
-const robotLineupImage = "attached_assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
-const bulkMintImage = "attached_assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
+const robotLineupImage = "/assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
+const bulkMintImage = "/assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
