@@ -403,7 +403,7 @@ export default function Home() {
               "We are building the <span className="text-primary">DNS for Robots</span>."
             </h3>
             <p className="text-lg text-muted-foreground">
-              As autonomous agents multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. ai-robot.eth provides the global standard for this registry.
+              As autonomous robots multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. Robot ID provides the global standard for this registry.
             </p>
             <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/5 font-mono mt-4 bg-white">
               VIEW_TECHNICAL_PAPER
