@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
 import robotLineupImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
+import bulkMintImage from "@assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -166,51 +167,12 @@ export default function Home() {
 
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition duration-1000"></div>
-              <div className="relative rounded-lg border border-border bg-white p-6 shadow-2xl overflow-hidden">
-                <div className="flex items-center gap-2 mb-4 text-muted-foreground text-xs font-mono border-b border-border pb-2">
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span>fleet_manifest_v1.csv</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-mono">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="py-2 px-2 text-primary font-bold">Name</th>
-                        <th className="py-2 px-2 text-muted-foreground">Make</th>
-                        <th className="py-2 px-2 text-muted-foreground">Model</th>
-                        <th className="py-2 px-2 text-muted-foreground">Serial</th>
-                        <th className="py-2 px-2 text-muted-foreground">Website</th>
-                        <th className="py-2 px-2 text-muted-foreground">Social</th>
-                      </tr>
-                    </thead>
-                    <tbody className="opacity-70">
-                      <tr className="border-b border-border/50">
-                        <td className="py-2 px-2 font-bold">optimus-01</td>
-                        <td className="py-2 px-2">Tesla</td>
-                        <td className="py-2 px-2">Gen2</td>
-                        <td className="py-2 px-2">TSL-992</td>
-                        <td className="py-2 px-2">tesla.com</td>
-                        <td className="py-2 px-2">@tesla</td>
-                      </tr>
-                      <tr className="border-b border-border/50">
-                        <td className="py-2 px-2 font-bold">atlas-x9</td>
-                        <td className="py-2 px-2">Boston</td>
-                        <td className="py-2 px-2">Atlas</td>
-                        <td className="py-2 px-2">BD-881</td>
-                        <td className="py-2 px-2">bostondynamics.com</td>
-                        <td className="py-2 px-2">@boston_dyn</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2 px-2 font-bold text-muted-foreground italic">...</td>
-                        <td className="py-2 px-2">...</td>
-                        <td className="py-2 px-2">...</td>
-                        <td className="py-2 px-2">...</td>
-                        <td className="py-2 px-2">...</td>
-                        <td className="py-2 px-2">...</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div className="relative rounded-lg border border-border bg-white p-2 shadow-2xl overflow-hidden">
+                <img 
+                  src={bulkMintImage} 
+                  alt="Robots in a factory line ready for identity minting" 
+                  className="w-full h-auto rounded-md"
+                />
               </div>
             </div>
           </div>
