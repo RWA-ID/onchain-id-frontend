@@ -92,16 +92,6 @@ export default function Home() {
 
         <div className="container relative z-10 px-6 pt-20">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="inline-block"
-            >
-              <span className="px-3 py-1 border border-primary/30 bg-white/80 backdrop-blur-md text-primary text-xs font-mono tracking-widest uppercase rounded-sm shadow-sm">
-                Launching on Base
-              </span>
-            </motion.div>
             
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
