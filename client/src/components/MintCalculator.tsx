@@ -167,11 +167,6 @@ export function MintCalculator() {
               </div>
             </div>
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-// ... imports
-
-// ... inside MintCalculator return JSX
-
             <div className="pt-6 border-t border-white/10">
               <ConnectButton.Custom>
                 {({

@@ -124,10 +124,6 @@ export default function Home() {
               Give every autonomous machine a secure, verifiable, and portable digital identity onchain.
             </motion.p>
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-// ... imports
-
-// ... inside Home component return
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
