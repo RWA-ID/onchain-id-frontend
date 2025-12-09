@@ -30,7 +30,7 @@ export function Navbar() {
             <Cpu className="w-5 h-5 text-primary" />
           </div>
           <span className="font-mono font-bold text-xl tracking-tight">
-            AI Robot <span className="text-primary">ID</span>
+            Robot <span className="text-primary">ID</span>
           </span>
         </Link>
 

@@ -311,7 +311,7 @@ export default function Home() {
               {/* Header */}
               <div className="space-y-6 text-center">
                 <h2 className="text-4xl md:text-6xl font-display font-bold">
-                  About <span className="text-primary">AI Robot ID</span>
+                  About <span className="text-primary">Robot ID</span>
                 </h2>
                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                   We are building the fundamental identity layer for the machine economy.
@@ -326,7 +326,7 @@ export default function Home() {
                     By 2030, there will be billions of autonomous agents and physical robots interacting with the world. 
                     Today, they lack a unified, decentralized way to identify themselves.
                     <br /><br />
-                    <strong>AI Robot ID</strong> creates a standard for machine identity that is secure, decentralized, and human-readable. 
+                    <strong>Robot ID</strong> creates a standard for machine identity that is secure, decentralized, and human-readable. 
                     We empower manufacturers to issue identities that allow robots to own assets, sign transactions, and prove their provenance without relying on a centralized server that can be shut down.
                   </p>
                 </div>
