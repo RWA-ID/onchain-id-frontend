@@ -21,8 +21,8 @@ import {
   CheckCircle,
   FileSpreadsheet
 } from "lucide-react";
-import heroImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
-import robotLineupImage from "@assets/robots_lineup.png";
+import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
+import robotLineupImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
