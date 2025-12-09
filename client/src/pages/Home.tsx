@@ -194,8 +194,8 @@ export default function Home() {
       {/* Bulk Minting Visualization Section */}
       <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
         <div className="container px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-5 space-y-6">
               <h2 className="text-3xl md:text-4xl font-display font-bold">
                 <span className="text-primary">Bulk Minting</span> Workflow
               </h2>
@@ -218,9 +218,9 @@ export default function Home() {
               </ul>
             </div>
 
-            <div className="relative group">
+            <div className="lg:col-span-7 relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition duration-1000"></div>
-              <div className="relative rounded-lg border border-border bg-white p-2 shadow-2xl overflow-hidden">
+              <div className="relative rounded-lg border border-border bg-white p-1 shadow-2xl overflow-hidden">
                 <img 
                   src={bulkMintImage} 
                   alt="Robots in a factory line ready for identity minting" 
