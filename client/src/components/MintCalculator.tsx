@@ -64,7 +64,7 @@ export function MintCalculator() {
   const estimatedGasUsd = estimatedGasEth * ethPrice;
 
   return (
-    <Card className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden">
+    <Card id="mint-calculator" className="w-full max-w-4xl mx-auto border-border shadow-xl bg-white overflow-hidden">
       <CardHeader className="bg-gray-50 border-b border-border pb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 bg-primary/10 rounded-lg">
@@ -166,10 +166,67 @@ export function MintCalculator() {
               </div>
             </div>
 
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+// ... imports
+
+// ... inside MintCalculator return JSX
+
             <div className="pt-6 border-t border-white/10">
-              <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-md shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]">
-                Start Minting Now <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <ConnectButton.Custom>
+                {({
+                  account,
+                  chain,
+                  openAccountModal,
+                  openChainModal,
+                  openConnectModal,
+                  authenticationStatus,
+                  mounted,
+                }) => {
+                  const ready = mounted && authenticationStatus !== 'loading';
+                  const connected =
+                    ready &&
+                    account &&
+                    chain &&
+                    (!authenticationStatus ||
+                      authenticationStatus === 'authenticated');
+
+                  return (
+                    <div
+                      className="w-full"
+                      {...(!ready && {
+                        'aria-hidden': true,
+                        'style': {
+                          opacity: 0,
+                          pointerEvents: 'none',
+                          userSelect: 'none',
+                        },
+                      })}
+                    >
+                      {(() => {
+                        if (!connected) {
+                          return (
+                            <Button 
+                              onClick={openConnectModal}
+                              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-md shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]"
+                            >
+                              Start Minting Now <ArrowRight className="ml-2 w-5 h-5" />
+                            </Button>
+                          );
+                        }
+                        
+                        return (
+                           <Button 
+                              disabled
+                              className="w-full h-12 bg-green-600 text-white font-bold text-lg rounded-md shadow-lg opacity-90 cursor-not-allowed"
+                            >
+                              Wallet Connected
+                            </Button>
+                        );
+                      })()}
+                    </div>
+                  );
+                }}
+              </ConnectButton.Custom>
             </div>
           </div>
         </div>

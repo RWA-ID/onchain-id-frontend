@@ -22,8 +22,10 @@ import {
   FileSpreadsheet
 } from "lucide-react";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
-import robotLineupImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
-import bulkMintImage from "@assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
+// import robotLineupImage from "@assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
+// import bulkMintImage from "@assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
+const robotLineupImage = "attached_assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
+const bulkMintImage = "attached_assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -123,16 +125,72 @@ export default function Home() {
               Give every autonomous machine a secure, verifiable, and portable digital identity onchain.
             </motion.p>
 
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+// ... imports
+
+// ... inside Home component return
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <Button className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg">
-                <Upload className="mr-2 h-4 w-4" />
-                START MINTING
-              </Button>
+              <ConnectButton.Custom>
+                {({
+                  account,
+                  chain,
+                  openAccountModal,
+                  openChainModal,
+                  openConnectModal,
+                  authenticationStatus,
+                  mounted,
+                }) => {
+                  const ready = mounted && authenticationStatus !== 'loading';
+                  const connected =
+                    ready &&
+                    account &&
+                    chain &&
+                    (!authenticationStatus ||
+                      authenticationStatus === 'authenticated');
+
+                  return (
+                    <div
+                      {...(!ready && {
+                        'aria-hidden': true,
+                        'style': {
+                          opacity: 0,
+                          pointerEvents: 'none',
+                          userSelect: 'none',
+                        },
+                      })}
+                    >
+                      {(() => {
+                        if (!connected) {
+                          return (
+                            <Button 
+                              onClick={openConnectModal}
+                              className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
+                            >
+                              <Upload className="mr-2 h-4 w-4" />
+                              START MINTING
+                            </Button>
+                          );
+                        }
+                        
+                        // If connected, scroll to calculator or show "Connected" state
+                        return (
+                          <Button 
+                            onClick={() => document.getElementById('mint-calculator')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
+                          >
+                             MINTING DASHBOARD
+                          </Button>
+                        );
+                      })()}
+                    </div>
+                  );
+                }}
+              </ConnectButton.Custom>
             </motion.div>
           </div>
         </div>
