@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Calculator, DollarSign, Zap, Fuel } from "lucide-react";
+import { Calculator, DollarSign, Zap, Fuel, ArrowRight } from "lucide-react";
 import { useGasPrice } from "wagmi";
 import { formatEther, formatGwei } from "viem";
+import { Button } from "@/components/ui/button";
 
 const PROMO_PRICE_ETH = 0.00003;
 // Rough estimates for gas usage
@@ -163,6 +164,12 @@ export function MintCalculator() {
                    {estimatedGasUsd > 0 && ` (~$${estimatedGasUsd.toFixed(2)})`}
                  </div>
               </div>
+            </div>
+
+            <div className="pt-6 border-t border-white/10">
+              <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-md shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]">
+                Start Minting Now <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
             </div>
           </div>
         </div>

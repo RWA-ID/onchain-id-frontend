@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/table";
 
 import { MintCalculator } from "@/components/MintCalculator";
-import { BulkMintForm } from "@/components/BulkMintForm";
 
 // const pricingTiers = [
 //   { min: 1,      max: 99,      priceUSD: 0.49 },
@@ -106,23 +105,21 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm"
+              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm max-w-5xl mx-auto"
             >
-              Open Bulk Identity <br />
+              Decentralized Identity For <br />
               <span className="text-primary">
-                Minting
-              </span> for Humanoid Robots
+                Robots, Drones, Vehicles & Devices
+              </span>
             </motion.h1>
 
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg md:text-xl text-slate-800 max-w-2xl mx-auto leading-relaxed font-medium"
+              className="text-lg md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium"
             >
-              No subscriptions. No hidden fees. Just upload your CSV.
-              <br/>
-              Issue unique, verifiable identities on <span className="font-mono font-bold">robot-id.eth</span> or <span className="font-mono font-bold">machine-id.eth</span> instantly via our bulk minting tool.
+              Give every autonomous machine a secure, verifiable, and portable digital identity onchain.
             </motion.p>
 
             <motion.div 
@@ -223,19 +220,7 @@ export default function Home() {
       {/* Pricing Section */}
       <section className="py-24 bg-gray-50 border-y border-border">
         <div className="container px-6 max-w-5xl mx-auto text-center space-y-12">
-           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-display font-bold">Launch Promotion Pricing</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              We've simplified our pricing for the Base mainnet launch. 
-              <br />
-              <span className="text-primary font-bold">0.00003 ETH</span> per identity + Gas. Flat rate.
-            </p>
-           </div>
-
            <MintCalculator />
-           <div id="mint-section" className="scroll-mt-24">
-             <BulkMintForm />
-           </div>
         </div>
       </section>
 
