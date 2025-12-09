@@ -290,10 +290,10 @@ export default function Home() {
                 icon: Settings
               },
             ].map((feature, i) => (
-              <Card key={i} className="h-full flex flex-col bg-white border-border/60 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/0 to-transparent group-hover:via-primary/50 transition-all duration-500" />
+              <Card key={i} className="h-full flex flex-col bg-white border-primary/10 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 group hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent group-hover:via-primary transition-all duration-500" />
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md group-hover:scale-110">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md group-hover:scale-110">
                     <feature.icon className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
                   </div>
                   <CardTitle className="font-display text-xl">{feature.title}</CardTitle>
