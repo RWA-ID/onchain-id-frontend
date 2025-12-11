@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
 import { useGasPrice } from "wagmi";
-import { formatEther, formatGwei, createPublicClient, custom } from "viem";
+import { formatEther, formatGwei, createPublicClient, custom, http } from "viem";
 import { base } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -51,15 +51,13 @@ export function MintCalculator() {
   // Fetch Price Quote from Contract using viem (direct RPC/Window)
   useEffect(() => {
     async function fetchQuote() {
-      // If window.ethereum is available, use it (similar to BrowserProvider)
-      // Otherwise, we could default to a public provider, but sticking to "wallet connected" logic for now
-      // or just try to use window.ethereum if present.
-      if (!window.ethereum) return;
-      
       try {
+        // Prefer window.ethereum if available, otherwise fallback to public RPC
+        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://mainnet.base.org");
+        
         const publicClient = createPublicClient({
           chain: base,
-          transport: custom(window.ethereum as any)
+          transport: transport
         });
 
         const mintCostWei = await publicClient.readContract({
