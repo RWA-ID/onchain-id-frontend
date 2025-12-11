@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
-import { useGasPrice, useReadContract } from "wagmi";
+import { useGasPrice } from "wagmi";
 import { formatEther, formatGwei } from "viem";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ethers } from "ethers";
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Zone IDs: 0=ROBOT, 1=MACHINE, 2=DEVICE, 3=DRONE, 4=VEHICLE
 const ZONES = [
@@ -27,6 +27,7 @@ export function MintCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
   const [selectedZone, setSelectedZone] = useState<number>(0);
   const [ethPrice, setEthPrice] = useState<number>(3800);
+  const [quoteEth, setQuoteEth] = useState<number>(0);
   
   const { data: gasPrice } = useGasPrice({ chainId: 8453 }); // Base Chain ID
 
@@ -46,16 +47,25 @@ export function MintCalculator() {
     fetchEthPrice();
   }, []);
 
-  // Fetch Price Quote from Contract
-  const { data: quoteEth } = useReadContract({
-    address: CONTRACT_ADDRESS as `0x${string}`,
-    abi: ABI,
-    functionName: 'quoteEth',
-    args: [selectedZone, BigInt(quantity)],
-    chainId: 8453,
-  });
+  // Fetch Price Quote from Contract using ethers.js
+  useEffect(() => {
+    async function fetchQuote() {
+      if (!window.ethereum) return;
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+        const mintCostWei = await contract.quoteEth(selectedZone, BigInt(quantity));
+        const mintCostEth = parseFloat(ethers.formatEther(mintCostWei));
+        setQuoteEth(mintCostEth);
+      } catch (error) {
+        console.error("Error fetching quote:", error);
+        setQuoteEth(0);
+      }
+    }
+    fetchQuote();
+  }, [selectedZone, quantity]);
 
-  const totalPriceEth = quoteEth ? parseFloat(formatEther(quoteEth)) : 0;
+  const totalPriceEth = quoteEth;
   const unitPriceEth = quantity > 0 ? totalPriceEth / quantity : 0;
 
   const estimatedGas = gasPrice ? (BASE_GAS + (GAS_PER_UNIT * BigInt(quantity))) * gasPrice : BigInt(0);
