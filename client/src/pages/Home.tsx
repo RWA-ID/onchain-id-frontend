@@ -53,7 +53,7 @@ export default function Home() {
       icon: Factory,
       title: "Industrial Workforce",
       subtitle: "Secure Manufacturing",
-      desc: "General-purpose humanoid workers need verified identities to operate on production lines and access restricted zones. Using AI Robot ID, every humanoid unit has a unique on-chain identity that safety systems verify instantly, replacing the need for manual badge scans.",
+      desc: "General-purpose humanoid workers need verified identities to operate on production lines and access restricted zones. Using AI Onchain ID, every humanoid unit has a unique on-chain identity that safety systems verify instantly, replacing the need for manual badge scans.",
       tags: ["Access Control", "Safety Protocols", "Audit Logs"]
     },
     {
@@ -317,7 +317,7 @@ export default function Home() {
               {/* Header */}
               <div className="space-y-6 text-center">
                 <h2 className="text-4xl md:text-6xl font-display font-bold">
-                  About <span className="text-primary">Robot ID</span>
+                  About <span className="text-primary">Onchain ID</span>
                 </h2>
                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                   We are building the fundamental identity layer for the machine economy.
@@ -332,7 +332,7 @@ export default function Home() {
                     By 2030, there will be billions of autonomous agents and physical robots interacting with the world. 
                     Today, they lack a unified, decentralized way to identify themselves.
                     <br /><br />
-                    <strong>Robot ID</strong> creates a standard for machine identity that is secure, decentralized, and human-readable. 
+                    <strong>Onchain ID</strong> creates a standard for machine identity that is secure, decentralized, and human-readable. 
                     We empower manufacturers to issue identities that allow robots to own assets, sign transactions, and prove their provenance without relying on a centralized server that can be shut down.
                   </p>
                 </div>
@@ -447,7 +447,7 @@ export default function Home() {
               "We are building the <span className="text-primary">DNS for Robots</span>."
             </h3>
             <p className="text-lg text-muted-foreground">
-              As autonomous robots multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. Robot ID provides the global standard for this registry.
+              As autonomous robots multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. Onchain ID provides the global standard for this registry.
             </p>
             <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/5 font-mono mt-4 bg-white">
               VIEW_TECHNICAL_PAPER
