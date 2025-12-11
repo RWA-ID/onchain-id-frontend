@@ -195,7 +195,7 @@ export default function Home() {
               </p>
               <ul className="space-y-4 pt-4">
                 {[
-                  "Choose robot-id.eth or machine-id.eth",
+                  "Choose robot-id.eth, machine-id.eth, device-id.eth, drone-id.eth, or vehicle-id.eth",
                   "CSV Upload (6 columns)",
                   "Instant on-chain registration",
                   "Full ownership & control"
@@ -246,7 +246,7 @@ export default function Home() {
             {[
               {
                 title: "Subdomain Issuance",
-                desc: "Choose between robot-id.eth or machine-id.eth for your fleet identities.",
+                desc: "Choose between robot-id.eth, machine-id.eth, device-id.eth, drone-id.eth, or vehicle-id.eth for your fleet identities.",
                 icon: Globe
               },
               {
