@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet } from "lucide-react";
+import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
 import { useGasPrice, useReadContract } from "wagmi";
 import { formatEther, formatGwei } from "viem";
 import { Button } from "@/components/ui/button";
@@ -188,6 +188,21 @@ export function MintCalculator() {
               </div>
             </div>
             
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 text-sm flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                Subdomain Cost
+              </span>
+              <div className="text-right">
+                <div className="text-slate-300 font-mono text-sm">
+                  {totalPriceEth > 0 ? `${totalPriceEth.toFixed(5)} ETH` : "0.00000 ETH"}
+                </div>
+                 <div className="text-[10px] text-slate-500 font-mono">
+                   ≈ ${(totalPriceEth * ethPrice).toFixed(2)} USD
+                 </div>
+              </div>
+            </div>
+
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm flex items-center gap-2">
                 <Fuel className="w-4 h-4" />
