@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
 import { useGasPrice } from "wagmi";
-import { formatEther, formatGwei } from "viem";
+import { formatEther, formatGwei, createPublicClient, custom } from "viem";
+import { base } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { ethers } from "ethers";
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -48,15 +48,28 @@ export function MintCalculator() {
     fetchEthPrice();
   }, []);
 
-  // Fetch Price Quote from Contract using ethers.js
+  // Fetch Price Quote from Contract using viem (direct RPC/Window)
   useEffect(() => {
     async function fetchQuote() {
+      // If window.ethereum is available, use it (similar to BrowserProvider)
+      // Otherwise, we could default to a public provider, but sticking to "wallet connected" logic for now
+      // or just try to use window.ethereum if present.
       if (!window.ethereum) return;
+      
       try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-        const mintCostWei = await contract.quoteEth(selectedZone, BigInt(quantity));
-        const mintCostEth = parseFloat(ethers.formatEther(mintCostWei));
+        const publicClient = createPublicClient({
+          chain: base,
+          transport: custom(window.ethereum as any)
+        });
+
+        const mintCostWei = await publicClient.readContract({
+          address: CONTRACT_ADDRESS as `0x${string}`,
+          abi: ABI,
+          functionName: 'quoteEth',
+          args: [selectedZone, BigInt(quantity)]
+        }) as bigint;
+        
+        const mintCostEth = parseFloat(formatEther(mintCostWei));
         setQuoteEth(mintCostEth);
       } catch (error) {
         console.error("Error fetching quote:", error);
