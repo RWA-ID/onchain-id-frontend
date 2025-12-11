@@ -10,6 +10,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ethers } from "ethers";
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Zone IDs: 0=ROBOT, 1=MACHINE, 2=DEVICE, 3=DRONE, 4=VEHICLE
 const ZONES = [
