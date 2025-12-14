@@ -26,8 +26,13 @@ import {
 } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
-const robotLineupImage = "/assets/B55F00D4-FA9C-4B8B-B8D8-B59433051F95_1765296692722.PNG";
+
+const robotImage = "/assets/robot_id.png";
+const droneImage = "/assets/drone_id.png";
+const deviceImage = "/assets/device_id.png";
+const vehicleImage = "/assets/vehicle_id.png";
 const bulkMintImage = "/assets/1FADDC47-4F0D-4DD9-A0CF-9F40D1A97308_1765297034311.PNG";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -438,25 +443,47 @@ export default function Home() {
 
       {/* Visual Break / Quote */}
       <section className="py-24 bg-gray-50 border-y border-border relative overflow-hidden">
-        <div className="container px-6 relative z-10 flex flex-col md:flex-row items-center gap-12">
-          <div className="md:w-1/2">
-            <img 
-              src={robotLineupImage} 
-              alt="AI Robots with ENS Identities" 
-              className="rounded-xl shadow-2xl border border-border opacity-95 hover:opacity-100 transition-opacity"
-            />
-          </div>
-          <div className="md:w-1/2 space-y-6">
-            <h3 className="text-3xl font-display font-bold leading-tight">
-              "We are building the <span className="text-primary">DNS for Robots</span>."
+        <div className="container px-6 relative z-10 flex flex-col items-center gap-12 text-center">
+          
+          <div className="space-y-6 max-w-4xl mx-auto">
+            <h3 className="text-3xl md:text-5xl font-display font-bold leading-tight">
+              "We are building the <span className="text-primary">DNS for Robots</span>, Drones, Devices & Vehicles."
             </h3>
-            <p className="text-lg text-muted-foreground">
-              As autonomous robots multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. Onchain ID provides the global standard for this registry.
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              As autonomous machines multiply, they need a verifiable, decentralized way to prove who they are, who made them, and who owns them. Onchain ID provides the global standard for this registry.
             </p>
             <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/5 font-mono mt-4 bg-white">
               VIEW_TECHNICAL_PAPER
             </Button>
           </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-6xl mt-8">
+            <div className="group relative aspect-square rounded-xl overflow-hidden shadow-lg border border-border">
+              <img src={robotImage} alt="Robot ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                <span className="text-white font-mono font-bold">robot-id.eth</span>
+              </div>
+            </div>
+            <div className="group relative aspect-square rounded-xl overflow-hidden shadow-lg border border-border">
+              <img src={droneImage} alt="Drone ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                <span className="text-white font-mono font-bold">drone-id.eth</span>
+              </div>
+            </div>
+            <div className="group relative aspect-square rounded-xl overflow-hidden shadow-lg border border-border">
+              <img src={deviceImage} alt="Device ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                <span className="text-white font-mono font-bold">device-id.eth</span>
+              </div>
+            </div>
+            <div className="group relative aspect-square rounded-xl overflow-hidden shadow-lg border border-border">
+              <img src={vehicleImage} alt="Vehicle ID" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                <span className="text-white font-mono font-bold">vehicle-id.eth</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAccount, useGasPrice } from "wagmi";
+import { useAccount, useGasPrice, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useLocation } from "wouter";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { 
@@ -27,6 +27,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
@@ -44,7 +45,8 @@ const BASE_GAS = BigInt(100000);
 const GAS_PER_UNIT = BigInt(45000); 
 
 export default function MintPage() {
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [selectedZone, setSelectedZone] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -52,8 +54,34 @@ export default function MintPage() {
   const [quoteUSDC, setQuoteUSDC] = useState<number>(0);
   const [isCalculating, setIsCalculating] = useState(false);
   const [ethPrice, setEthPrice] = useState<number>(0);
+  
+  // Parsed Data State
+  const [parsedData, setParsedData] = useState<{
+    labels: string[],
+    makes: string[],
+    models: string[],
+    serials: string[],
+    websites: string[],
+    socials: string[]
+  } | null>(null);
 
   const { data: gasPrice } = useGasPrice({ chainId: 8453 });
+  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  // Effect for Transaction Success
+  useEffect(() => {
+    if (isConfirmed) {
+      toast({
+        title: "Mint Successful!",
+        description: `Successfully registered ${quantity} identities.`,
+        variant: "default",
+      });
+      // Optional: Reset form or redirect
+    }
+  }, [isConfirmed, quantity, toast]);
 
   // Fetch ETH Price
   useEffect(() => {
@@ -63,26 +91,67 @@ export default function MintPage() {
       .catch(() => setEthPrice(3800));
   }, []);
 
-  // Handle File Upload
+  // Handle File Upload & Parsing
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
       
-      // Basic CSV parsing to get row count (quantity)
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target?.result as string;
         if (text) {
-          // Split by newline and filter empty lines
-          // Assuming header row exists, so quantity = lines - 1
           const lines = text.split(/\r\n|\n/).filter(line => line.trim().length > 0);
-          const count = Math.max(0, lines.length - 1); // Subtract header
-          setQuantity(count);
+          
+          // Basic CSV Parsing (assuming 6 columns, skipping header)
+          // Format: Label, Make, Model, Serial, Website, Social
+          const labels: string[] = [];
+          const makes: string[] = [];
+          const models: string[] = [];
+          const serials: string[] = [];
+          const websites: string[] = [];
+          const socials: string[] = [];
+
+          // Start from index 1 to skip header
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.trim());
+            if (cols.length >= 6) {
+              labels.push(cols[0]);
+              makes.push(cols[1]);
+              models.push(cols[2]);
+              serials.push(cols[3]);
+              websites.push(cols[4]);
+              socials.push(cols[5]);
+            }
+          }
+
+          setParsedData({ labels, makes, models, serials, websites, socials });
+          setQuantity(labels.length);
         }
       };
       reader.readAsText(selectedFile);
     }
+  };
+
+  // Handle Mint Action
+  const handleMint = () => {
+    if (!parsedData || selectedZone === null || !address) return;
+
+    writeContract({
+      address: CONTRACT_ADDRESS as `0x${string}`,
+      abi: ABI,
+      functionName: 'bulkMintUSDC',
+      args: [
+        parsedData.labels,
+        parsedData.makes,
+        parsedData.models,
+        parsedData.serials,
+        parsedData.websites,
+        parsedData.socials,
+        address, // finalOwner
+        selectedZone
+      ],
+    });
   };
 
   // Fetch Quote when Zone or Quantity changes
@@ -327,12 +396,18 @@ export default function MintPage() {
                 {/* Action Button */}
                 <Button 
                   className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 mt-4"
-                  disabled={quantity === 0 || selectedZone === null || isCalculating}
+                  disabled={quantity === 0 || selectedZone === null || isCalculating || isPending || isConfirming}
+                  onClick={handleMint}
                 >
                   {isCalculating ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Calculating...
+                    </>
+                  ) : isPending || isConfirming ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Processing...
                     </>
                   ) : (
                     <>
