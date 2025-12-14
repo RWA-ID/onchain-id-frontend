@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { useLocation } from "wouter";
+import { useAccount } from "wagmi";
+import { useEffect } from "react";
 import { 
   Cpu, 
   Database, 
@@ -38,16 +41,17 @@ import {
 
 import { MintCalculator } from "@/components/MintCalculator";
 
-// const pricingTiers = [
-//   { min: 1,      max: 99,      priceUSD: 0.49 },
-//   { min: 100,    max: 999,     priceUSD: 0.19 },
-//   { min: 1_000,  max: 9_999,   priceUSD: 0.079 },
-//   { min: 10_000, max: 49_999,  priceUSD: 0.049 },
-//   { min: 50_000, max: 249_999, priceUSD: 0.029 },
-//   { min: 250_000, max: 1_000_000_000, priceUSD: 0.019 }
-// ];
-
 export default function Home() {
+  const [_, setLocation] = useLocation();
+  const { isConnected } = useAccount();
+
+  // Auto-redirect to mint dashboard if connected
+  useEffect(() => {
+    if (isConnected) {
+      setLocation("/mint");
+    }
+  }, [isConnected, setLocation]);
+
   const cases = [
     {
       icon: Factory,
@@ -153,7 +157,7 @@ export default function Home() {
                         if (!connected) {
                           return (
                             <Button 
-                              onClick={() => window.location.href = '/mint'}
+                              onClick={openConnectModal}
                               className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
                             >
                               <Upload className="mr-2 h-4 w-4" />
@@ -165,7 +169,7 @@ export default function Home() {
                         // If connected, scroll to calculator or show "Connected" state
                         return (
                           <Button 
-                            onClick={() => window.location.href = '/mint'}
+                            onClick={() => setLocation('/mint')}
                             className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
                           >
                              MINTING DASHBOARD
