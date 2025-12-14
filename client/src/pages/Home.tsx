@@ -153,7 +153,7 @@ export default function Home() {
                         if (!connected) {
                           return (
                             <Button 
-                              onClick={openConnectModal}
+                              onClick={() => window.location.href = '/mint'}
                               className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
                             >
                               <Upload className="mr-2 h-4 w-4" />
@@ -165,7 +165,7 @@ export default function Home() {
                         // If connected, scroll to calculator or show "Connected" state
                         return (
                           <Button 
-                            onClick={() => document.getElementById('mint-calculator')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => window.location.href = '/mint'}
                             className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
                           >
                              MINTING DASHBOARD

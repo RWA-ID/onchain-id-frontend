@@ -3,7 +3,7 @@ import { base } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
   appName: 'Onchain ID',
-  projectId: 'YOUR_PROJECT_ID', // TODO: Get a project ID from WalletConnect
+  projectId: '3a8170812b534d0ff9d794f35a9cc25e', // Valid WalletConnect Project ID for RainbowKit
   chains: [base],
-  ssr: false, // Client-side only for this mockup
+  ssr: false, 
 });
