@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
 import { useGasPrice } from "wagmi";
-import { formatEther, formatGwei, createPublicClient, custom, http } from "viem";
+import { formatEther, formatUnits, formatGwei, createPublicClient, custom, http } from "viem";
 import { base } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -28,7 +28,7 @@ export function MintCalculator() {
   const [quantity, setQuantity] = useState<number>(1000);
   const [selectedZone, setSelectedZone] = useState<number>(0);
   const [ethPrice, setEthPrice] = useState<number>(3800);
-  const [quoteEth, setQuoteEth] = useState<number>(0);
+  const [quoteUSDC, setQuoteUSDC] = useState<number>(0);
   
   const { data: gasPrice } = useGasPrice({ chainId: 8453 }); // Base Chain ID
 
@@ -63,27 +63,27 @@ export function MintCalculator() {
         const mintCostWei = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'quoteEth',
+          functionName: 'quoteUSDC',
           args: [selectedZone, BigInt(quantity)]
         }) as bigint;
         
-        const mintCostEth = parseFloat(formatEther(mintCostWei));
-        setQuoteEth(mintCostEth);
+        const mintCostUSDC = parseFloat(formatUnits(mintCostWei, 6)); // USDC uses 6 decimals
+        setQuoteUSDC(mintCostUSDC);
       } catch (error) {
         console.error("Error fetching quote:", error);
-        setQuoteEth(0);
+        setQuoteUSDC(0);
       }
     }
     fetchQuote();
   }, [selectedZone, quantity]);
 
-  const totalPriceEth = quoteEth;
-  const unitPriceEth = quantity > 0 ? totalPriceEth / quantity : 0;
+  const totalPriceUSDC = quoteUSDC;
+  const unitPriceUSDC = quantity > 0 ? totalPriceUSDC / quantity : 0;
 
   const estimatedGas = gasPrice ? (BASE_GAS + (GAS_PER_UNIT * BigInt(quantity))) * gasPrice : BigInt(0);
   const estimatedGasEth = parseFloat(formatEther(estimatedGas));
   const estimatedGasUsd = estimatedGasEth * ethPrice;
-  const totalPriceUsd = (totalPriceEth + estimatedGasEth) * ethPrice;
+  const totalPriceUsdWithGas = totalPriceUSDC + estimatedGasUsd;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value.replace(/,/g, ''));
@@ -186,12 +186,12 @@ export function MintCalculator() {
             <div className="flex flex-col gap-1">
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-display font-bold tracking-tight">
-                  {(totalPriceEth + estimatedGasEth).toFixed(5)}
+                  {totalPriceUSDC.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
-                <span className="text-xl font-medium text-slate-400">ETH</span>
+                <span className="text-xl font-medium text-slate-400">USDC</span>
               </div>
               <div className="text-slate-400 font-mono text-sm">
-                ≈ ${totalPriceUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                + Gas Fees
               </div>
             </div>
           </div>
@@ -204,8 +204,7 @@ export function MintCalculator() {
                   TIERED
                 </span>
                 <div className="text-right">
-                   <div className="font-mono font-bold text-xl leading-none">{unitPriceEth.toFixed(6)} ETH</div>
-                   <div className="text-[10px] text-slate-400 font-mono mt-1">≈ ${(unitPriceEth * ethPrice).toFixed(3)} USD</div>
+                   <div className="font-mono font-bold text-xl leading-none">${unitPriceUSDC.toFixed(3)}</div>
                 </div>
               </div>
             </div>
@@ -217,11 +216,8 @@ export function MintCalculator() {
               </span>
               <div className="text-right">
                 <div className="text-slate-300 font-mono text-sm">
-                  {totalPriceEth > 0 ? `${totalPriceEth.toFixed(5)} ETH` : "0.00000 ETH"}
+                  {totalPriceUSDC > 0 ? `$${totalPriceUSDC.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : "$0.00"}
                 </div>
-                 <div className="text-[10px] text-slate-500 font-mono">
-                   ≈ ${(totalPriceEth * ethPrice).toFixed(2)} USD
-                 </div>
               </div>
             </div>
 
