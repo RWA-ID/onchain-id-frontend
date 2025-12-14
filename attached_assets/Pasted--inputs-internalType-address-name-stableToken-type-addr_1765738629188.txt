@@ -1,0 +1,114 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_stableToken", "type": "address" },
+      { "internalType": "address", "name": "_payout", "type": "address" },
+      { "internalType": "address", "name": "_owner", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "finalOwner", "type": "address" },
+      { "indexed": true, "internalType": "uint8", "name": "zone", "type": "uint8" },
+      { "indexed": false, "internalType": "bytes32", "name": "labelhash", "type": "bytes32" },
+      { "indexed": false, "internalType": "bytes32", "name": "metadataHash", "type": "bytes32" }
+    ],
+    "name": "NameMinted",
+    "type": "event"
+  },
+
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "buyer", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "quantity", "type": "uint256" },
+      { "indexed": false, "internalType": "uint8", "name": "zone", "type": "uint8" },
+      { "indexed": false, "internalType": "uint256", "name": "unitPrice", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "totalPaid", "type": "uint256" }
+    ],
+    "name": "Minted",
+    "type": "event"
+  },
+
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [],
+    "name": "payout",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [],
+    "name": "stableToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [{ "internalType": "uint8", "name": "zone", "type": "uint8" }],
+    "name": "getUSDCPrices",
+    "outputs": [{ "internalType": "uint256[5]", "name": "", "type": "uint256[5]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "zone", "type": "uint8" },
+      { "internalType": "uint256", "name": "quantity", "type": "uint256" }
+    ],
+    "name": "quoteUSDC",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "string[]", "name": "labels", "type": "string[]" },
+      { "internalType": "string[]", "name": "makes", "type": "string[]" },
+      { "internalType": "string[]", "name": "models", "type": "string[]" },
+      { "internalType": "string[]", "name": "serials", "type": "string[]" },
+      { "internalType": "string[]", "name": "websites", "type": "string[]" },
+      { "internalType": "string[]", "name": "socials", "type": "string[]" },
+      { "internalType": "address", "name": "finalOwner", "type": "address" },
+      { "internalType": "uint8", "name": "zone", "type": "uint8" }
+    ],
+    "name": "bulkMintUSDC",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "string[]", "name": "labels", "type": "string[]" },
+      { "internalType": "string[]", "name": "makes", "type": "string[]" },
+      { "internalType": "string[]", "name": "models", "type": "string[]" },
+      { "internalType": "string[]", "name": "serials", "type": "string[]" },
+      { "internalType": "string[]", "name": "websites", "type": "string[]" },
+      { "internalType": "string[]", "name": "socials", "type": "string[]" },
+      { "internalType": "address", "name": "finalOwner", "type": "address" },
+      { "internalType": "uint8", "name": "zone", "type": "uint8" }
+    ],
+    "name": "bulkMintEth",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]
