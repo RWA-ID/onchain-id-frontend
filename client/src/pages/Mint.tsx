@@ -14,7 +14,8 @@ import {
   AlertCircle,
   Loader2,
   DollarSign,
-  Fuel
+  Fuel,
+  PenLine
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPublicClient, http, formatUnits, formatEther, formatGwei, custom } from "viem";
@@ -23,6 +24,8 @@ import { base } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -49,6 +52,11 @@ export default function MintPage() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [selectedZone, setSelectedZone] = useState<number | null>(null);
+  
+  // Mint Mode State
+  const [mintMode, setMintMode] = useState<"csv" | "single">("csv");
+  const [singleName, setSingleName] = useState("");
+
   const [file, setFile] = useState<File | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
   const [quoteUSDC, setQuoteUSDC] = useState<number>(0);
@@ -71,6 +79,16 @@ export default function MintPage() {
     hash,
   });
 
+  // Update quantity when mode or input changes
+  useEffect(() => {
+    if (mintMode === "single") {
+      setQuantity(singleName.trim() ? 1 : 0);
+    } else {
+      // Restore CSV quantity if available
+      setQuantity(parsedData?.labels.length || 0);
+    }
+  }, [mintMode, singleName, parsedData]);
+
   // Effect for Transaction Success
   useEffect(() => {
     if (isConfirmed) {
@@ -79,9 +97,10 @@ export default function MintPage() {
         description: `Successfully registered ${quantity} identities.`,
         variant: "default",
       });
-      // Optional: Reset form or redirect
+      // Optional: Reset form
+      if (mintMode === "single") setSingleName("");
     }
-  }, [isConfirmed, quantity, toast]);
+  }, [isConfirmed, quantity, toast, mintMode]);
 
   // Fetch ETH Price
   useEffect(() => {
@@ -126,7 +145,10 @@ export default function MintPage() {
           }
 
           setParsedData({ labels, makes, models, serials, websites, socials });
-          setQuantity(labels.length);
+          // Only update quantity if we are in CSV mode
+          if (mintMode === "csv") {
+             setQuantity(labels.length);
+          }
         }
       };
       reader.readAsText(selectedFile);
@@ -135,23 +157,45 @@ export default function MintPage() {
 
   // Handle Mint Action
   const handleMint = () => {
-    if (!parsedData || selectedZone === null || !address) return;
+    if (selectedZone === null || !address) return;
 
-    writeContract({
-      address: CONTRACT_ADDRESS as `0x${string}`,
-      abi: ABI,
-      functionName: 'bulkMintUSDC',
-      args: [
-        parsedData.labels,
-        parsedData.makes,
-        parsedData.models,
-        parsedData.serials,
-        parsedData.websites,
-        parsedData.socials,
-        address, // finalOwner
-        selectedZone
-      ],
-    });
+    if (mintMode === "single") {
+        if (!singleName.trim()) return;
+        
+        writeContract({
+          address: CONTRACT_ADDRESS as `0x${string}`,
+          abi: ABI,
+          functionName: 'bulkMintUSDC',
+          args: [
+            [singleName],     // labels
+            [""],             // makes
+            [""],             // models
+            [""],             // serials
+            [""],             // websites
+            [""],             // socials
+            address,          // finalOwner
+            selectedZone
+          ],
+        });
+    } else {
+        if (!parsedData) return;
+
+        writeContract({
+          address: CONTRACT_ADDRESS as `0x${string}`,
+          abi: ABI,
+          functionName: 'bulkMintUSDC',
+          args: [
+            parsedData.labels,
+            parsedData.makes,
+            parsedData.models,
+            parsedData.serials,
+            parsedData.websites,
+            parsedData.socials,
+            address, // finalOwner
+            selectedZone
+          ],
+        });
+    }
   };
 
   // Fetch Quote when Zone or Quantity changes
@@ -270,55 +314,101 @@ export default function MintPage() {
               </CardContent>
             </Card>
 
-            {/* Step 2: CSV Upload */}
+            {/* Step 2: Minting Data */}
             <Card className={`border-border shadow-sm transition-opacity duration-300 ${selectedZone === null ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">2</span>
-                  Upload Fleet Data
+                  Provide Identity Data
                 </CardTitle>
                 <CardDescription>
-                  Upload a CSV file with 6 columns: Name, Make, Model, Serial, Website, Social.
+                  Choose between single registration or bulk CSV upload.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50/50 transition-colors relative group">
-                  <input 
-                    type="file" 
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                      <FileSpreadsheet className="w-8 h-8" />
-                    </div>
-                    {file ? (
-                      <div>
-                        <p className="font-bold text-lg text-green-600 flex items-center justify-center gap-2">
-                          <CheckCircle2 className="w-5 h-5" />
-                          {file.name}
-                        </p>
-                        <p className="text-muted-foreground mt-1">{quantity} records found</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <p className="font-medium text-lg">Click to upload or drag and drop</p>
-                        <p className="text-sm text-muted-foreground">CSV files only (max 10MB)</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
                 
-                {quantity > 0 && (
-                  <Alert className="mt-4 bg-green-50 border-green-200 text-green-800">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <AlertTitle>Ready to Mint</AlertTitle>
-                    <AlertDescription>
-                      Successfully parsed {quantity} identities from your CSV.
-                    </AlertDescription>
-                  </Alert>
-                )}
+                <Tabs defaultValue="csv" className="w-full" onValueChange={(v) => setMintMode(v as "csv" | "single")}>
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="csv" className="flex items-center gap-2">
+                       <FileSpreadsheet className="w-4 h-4" />
+                       Bulk Upload (CSV)
+                    </TabsTrigger>
+                    <TabsTrigger value="single" className="flex items-center gap-2">
+                       <PenLine className="w-4 h-4" />
+                       Single Name
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="csv" className="space-y-4">
+                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50/50 transition-colors relative group">
+                      <input 
+                        type="file" 
+                        accept=".csv"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="space-y-4">
+                        <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                          <FileSpreadsheet className="w-8 h-8" />
+                        </div>
+                        {file ? (
+                          <div>
+                            <p className="font-bold text-lg text-green-600 flex items-center justify-center gap-2">
+                              <CheckCircle2 className="w-5 h-5" />
+                              {file.name}
+                            </p>
+                            <p className="text-muted-foreground mt-1">{quantity} records found</p>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="font-medium text-lg">Click to upload or drag and drop</p>
+                            <p className="text-sm text-muted-foreground">CSV files only (max 10MB)</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {mintMode === "csv" && quantity > 0 && (
+                      <Alert className="bg-green-50 border-green-200 text-green-800">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <AlertTitle>Ready to Mint</AlertTitle>
+                        <AlertDescription>
+                          Successfully parsed {quantity} identities from your CSV.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="single" className="space-y-6 py-4">
+                    <div className="space-y-2">
+                       <Label htmlFor="single-name">Identity Name</Label>
+                       <div className="flex items-center gap-2">
+                         <Input 
+                            id="single-name" 
+                            placeholder="e.g. optimus-prime-001" 
+                            className="flex-1 font-mono" 
+                            value={singleName}
+                            onChange={(e) => setSingleName(e.target.value)}
+                         />
+                         <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-md font-mono text-sm text-slate-500">
+                            .{selectedZone !== null ? ZONES[selectedZone].name : "eth"}
+                         </div>
+                       </div>
+                       <p className="text-xs text-muted-foreground">
+                         Only lowercase letters, numbers, and hyphens allowed.
+                       </p>
+                    </div>
+
+                    <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+                      <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                      <AlertTitle>Quick Mint</AlertTitle>
+                      <AlertDescription>
+                        Metadata fields (Make, Model, Serial, etc.) will be left blank for single mints. You can update them later.
+                      </AlertDescription>
+                    </Alert>
+                  </TabsContent>
+                </Tabs>
+
               </CardContent>
             </Card>
 
@@ -418,7 +508,7 @@ export default function MintPage() {
                 
                 {quantity === 0 && (
                   <p className="text-center text-xs text-slate-500 mt-2">
-                    Please select a zone and upload a CSV to proceed.
+                     {mintMode === "csv" ? "Please upload a CSV to proceed." : "Please enter a name to proceed."}
                   </p>
                 )}
 
