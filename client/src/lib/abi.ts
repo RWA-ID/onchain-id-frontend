@@ -1,9 +1,10 @@
 export const ABI = [
   {
     "inputs": [
-      { "internalType": "address", "name": "_stableToken", "type": "address" },
-      { "internalType": "address", "name": "_payout", "type": "address" },
-      { "internalType": "address", "name": "_owner", "type": "address" }
+      { "internalType": "address", "name": "_nameWrapper", "type": "address" },
+      { "internalType": "address", "name": "_oracle", "type": "address" },
+      { "internalType": "address", "name": "initialOwner", "type": "address" },
+      { "internalType": "address", "name": "_payoutAddress", "type": "address" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -11,95 +12,107 @@ export const ABI = [
   {
     "anonymous": false,
     "inputs": [
+      { "indexed": true, "internalType": "address", "name": "buyer", "type": "address" },
       { "indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "finalOwner", "type": "address" },
-      { "indexed": true, "internalType": "uint8", "name": "zone", "type": "uint8" },
-      { "indexed": false, "internalType": "bytes32", "name": "labelhash", "type": "bytes32" },
-      { "indexed": false, "internalType": "bytes32", "name": "metadataHash", "type": "bytes32" }
+      { "indexed": false, "internalType": "string", "name": "parentLabel", "type": "string" }
     ],
-    "name": "NameMinted",
+    "name": "LicenseBought",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "buyer", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "quantity", "type": "uint256" },
-      { "indexed": false, "internalType": "uint8", "name": "zone", "type": "uint8" },
-      { "indexed": false, "internalType": "uint256", "name": "unitPrice", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "totalPaid", "type": "uint256" }
+      { "indexed": true, "internalType": "address", "name": "registrant", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "parentLabel", "type": "string" },
+      { "indexed": false, "internalType": "uint256", "name": "quantity", "type": "uint256" }
     ],
-    "name": "Minted",
+    "name": "SubdomainsRegistered",
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "payout",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stableToken",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint8", "name": "zone", "type": "uint8" }],
-    "name": "getUSDCPrices",
-    "outputs": [{ "internalType": "uint256[5]", "name": "", "type": "uint256[5]" }],
-    "stateMutability": "view",
+    "inputs": [{ "internalType": "string", "name": "parentLabel", "type": "string" }],
+    "name": "buyLicense",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint8", "name": "zone", "type": "uint8" },
-      { "internalType": "uint256", "name": "quantity", "type": "uint256" }
+      { "internalType": "string", "name": "parentLabel", "type": "string" },
+      { "internalType": "string[]", "name": "labels", "type": "string[]" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "address", "name": "resolver", "type": "address" },
+      { "internalType": "uint64", "name": "ttl", "type": "uint64" }
     ],
-    "name": "quoteUSDC",
+    "name": "registerBulk",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nameWrapper",
+    "outputs": [{ "internalType": "contract INameWrapper", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oracle",
+    "outputs": [{ "internalType": "contract AggregatorV3Interface", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "licensePriceUSD",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "tierPricesUSD",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "payoutAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "parents",
+    "outputs": [{ "internalType": "string[]", "name": "", "type": "string[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "licenseParent",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+    "name": "balanceOf",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "string[]", "name": "labels", "type": "string[]" },
-      { "internalType": "string[]", "name": "makes", "type": "string[]" },
-      { "internalType": "string[]", "name": "models", "type": "string[]" },
-      { "internalType": "string[]", "name": "serials", "type": "string[]" },
-      { "internalType": "string[]", "name": "websites", "type": "string[]" },
-      { "internalType": "string[]", "name": "socials", "type": "string[]" },
-      { "internalType": "address", "name": "finalOwner", "type": "address" },
-      { "internalType": "uint8", "name": "zone", "type": "uint8" }
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint256", "name": "index", "type": "uint256" }
     ],
-    "name": "bulkMintUSDC",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "string[]", "name": "labels", "type": "string[]" },
-      { "internalType": "string[]", "name": "makes", "type": "string[]" },
-      { "internalType": "string[]", "name": "models", "type": "string[]" },
-      { "internalType": "string[]", "name": "serials", "type": "string[]" },
-      { "internalType": "string[]", "name": "websites", "type": "string[]" },
-      { "internalType": "string[]", "name": "socials", "type": "string[]" },
-      { "internalType": "address", "name": "finalOwner", "type": "address" },
-      { "internalType": "uint8", "name": "zone", "type": "uint8" }
-    ],
-    "name": "bulkMintEth",
-    "outputs": [],
-    "stateMutability": "payable",
+    "name": "tokenOfOwnerByIndex",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   }
 ] as const;

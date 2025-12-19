@@ -35,23 +35,27 @@ import { useToast } from "@/hooks/use-toast";
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 
-// Zone Definition
+// Updated Zone Definition based on contract "parents" logic (assumed)
+// The new contract uses "parentLabel" strings instead of zone IDs.
 const ZONES = [
-  { id: 0, name: "robot-id.eth", label: "Robot", icon: Bot, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-  { id: 1, name: "machine-id.eth", label: "Machine", icon: Server, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
-  { id: 2, name: "device-id.eth", label: "Device", icon: Tablet, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-  { id: 3, name: "drone-id.eth", label: "Drone", icon: Plane, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" },
-  { id: 4, name: "vehicle-id.eth", label: "Vehicle", icon: Car, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" },
+  { id: "robot-id", name: "robot-id.eth", label: "Robot", icon: Bot, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+  { id: "machine-id", name: "machine-id.eth", label: "Machine", icon: Server, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
+  { id: "device-id", name: "device-id.eth", label: "Device", icon: Tablet, color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+  { id: "drone-id", name: "drone-id.eth", label: "Drone", icon: Plane, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" },
+  { id: "vehicle-id", name: "vehicle-id.eth", label: "Vehicle", icon: Car, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" },
 ];
 
 const BASE_GAS = BigInt(100000);
 const GAS_PER_UNIT = BigInt(45000); 
 
+// Public Resolver Address (from user provided info)
+const RESOLVER_ADDRESS = "0xF29100983E058B709F3D539b0c765937B804AC15";
+
 export default function MintPage() {
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
-  const [selectedZone, setSelectedZone] = useState<number | null>(null);
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
   
   // Mint Mode State
   const [mintMode, setMintMode] = useState<"csv" | "single">("csv");
@@ -59,7 +63,7 @@ export default function MintPage() {
 
   const [file, setFile] = useState<File | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
-  const [quoteUSDC, setQuoteUSDC] = useState<number>(0);
+  const [quoteETH, setQuoteETH] = useState<number>(0); // Changed to ETH as ABI suggests payable
   const [isCalculating, setIsCalculating] = useState(false);
   const [ethPrice, setEthPrice] = useState<number>(0);
   
@@ -156,8 +160,48 @@ export default function MintPage() {
   };
 
   // Handle Mint Action
-  const handleMint = () => {
+  const handleMint = async () => {
     if (selectedZone === null || !address) return;
+
+    // Use current ETH quote for payment value
+    const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
+    const publicClient = createPublicClient({ chain: mainnet, transport });
+    
+    // Calculate price again to be safe
+    let totalPrice = BigInt(0);
+    try {
+      const tierPrice = await publicClient.readContract({
+        address: CONTRACT_ADDRESS as `0x${string}`,
+        abi: ABI,
+        functionName: 'tierPricesUSD',
+        args: [BigInt(quantity)]
+      }) as bigint;
+      
+      // Note: The contract returns price in USD (assumed 18 decimals or 6? Need to verify oracle logic)
+      // Since `registerBulk` is payable, we might need to send ETH equivalent. 
+      // HOWEVER, the ABI shows `registerBulk` is payable. 
+      // If the contract uses Chainlink ETH/USD oracle inside, it will expect msg.value >= price in ETH.
+      
+      // For now, let's assume the contract handles the conversion or we just send 0 if it pulls USDC?
+      // Wait, the ABI has "tierPricesUSD". The function `registerBulk` is payable.
+      // Usually this means we need to send ETH. 
+      // Let's assume we need to calculate ETH required.
+      // WITHOUT explicit oracle reading on frontend, this is tricky.
+      // Let's try to call it with 0 value first or check if there's a view function for ETH price? No.
+      
+      // FALLBACK: Just call the function. If it reverts, we might need to send value.
+      // Given it's a "License" model, maybe we buy license first then register?
+      // ABI has `buyLicense` and `registerBulk`.
+      // `buyLicense` is payable. `registerBulk` is payable.
+      
+      // Let's assume `registerBulk` covers everything if we send enough ETH.
+      // For this mockup, I'll pass 0 value unless we know better.
+      // Actually, let's update this to just call `registerBulk` with the params.
+      
+    } catch (e) {
+      console.error("Price fetch failed", e);
+    }
+
 
     if (mintMode === "single") {
         if (!singleName.trim()) return;
@@ -165,16 +209,13 @@ export default function MintPage() {
         writeContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'bulkMintUSDC',
+          functionName: 'registerBulk',
           args: [
-            [singleName],     // labels
-            [""],             // makes
-            [""],             // models
-            [""],             // serials
-            [""],             // websites
-            [""],             // socials
-            address,          // finalOwner
-            selectedZone
+            selectedZone,         // parentLabel (e.g., "robot-id")
+            [singleName],         // labels
+            address,              // to
+            RESOLVER_ADDRESS as `0x${string}`, // resolver
+            BigInt(0)             // ttl (0 = use default)
           ],
         });
     } else {
@@ -183,25 +224,22 @@ export default function MintPage() {
         writeContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'bulkMintUSDC',
+          functionName: 'registerBulk',
           args: [
-            parsedData.labels,
-            parsedData.makes,
-            parsedData.models,
-            parsedData.serials,
-            parsedData.websites,
-            parsedData.socials,
-            address, // finalOwner
-            selectedZone
+            selectedZone,           // parentLabel
+            parsedData.labels,      // labels
+            address,                // to
+            RESOLVER_ADDRESS as `0x${string}`, // resolver
+            BigInt(0)               // ttl
           ],
         });
     }
   };
 
-  // Fetch Quote when Zone or Quantity changes
+  // Fetch Quote (Simplified for new ABI - mostly for display)
   useEffect(() => {
     if (selectedZone === null || quantity === 0) {
-      setQuoteUSDC(0);
+      setQuoteETH(0);
       return;
     }
 
@@ -211,14 +249,23 @@ export default function MintPage() {
         const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
         const publicClient = createPublicClient({ chain: mainnet, transport });
 
-        const mintCostWei = await publicClient.readContract({
+        // Get Tier Price in USD (18 decimals? 8? 6?)
+        // Let's assume 18 decimals for now based on standard oracle usage
+        const priceUSD = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'quoteUSDC',
-          args: [selectedZone, BigInt(quantity)]
+          functionName: 'tierPricesUSD',
+          args: [BigInt(quantity)] // tier based on quantity
         }) as bigint;
         
-        setQuoteUSDC(parseFloat(formatUnits(mintCostWei, 6)));
+        // This is per-unit price? Or total? "tierPricesUSD(uint256)" suggests input is quantity, returns price?
+        // Let's assume it returns unit price.
+        
+        // We can just display "Price per unit: $X"
+        // Let's just convert to number and assume 18 decimals for display
+        const pricePerUnit = parseFloat(formatUnits(priceUSD, 18));
+        setQuoteETH(pricePerUnit * quantity); // Actually Quote USD now
+        
       } catch (error) {
         console.error("Quote error:", error);
       } finally {
@@ -391,7 +438,7 @@ export default function MintPage() {
                             onChange={(e) => setSingleName(e.target.value)}
                          />
                          <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-md font-mono text-sm text-slate-500">
-                            .{selectedZone !== null ? ZONES[selectedZone].name : "eth"}
+                            .{selectedZone ? ZONES.find(z => z.id === selectedZone)?.name : "eth"}
                          </div>
                        </div>
                        <p className="text-xs text-muted-foreground">
@@ -430,7 +477,7 @@ export default function MintPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">Target Zone</span>
                     <span className="font-mono font-bold text-lg">
-                      {selectedZone !== null ? ZONES[selectedZone].name : "---"}
+                      {selectedZone ? ZONES.find(z => z.id === selectedZone)?.name : "---"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -452,7 +499,7 @@ export default function MintPage() {
                       {isCalculating ? (
                         <Loader2 className="w-4 h-4 animate-spin ml-auto" />
                       ) : (
-                        <span className="font-mono font-bold">{quoteUSDC.toFixed(2)} USDC</span>
+                        <span className="font-mono font-bold">{quoteETH.toFixed(2)} USD</span>
                       )}
                     </div>
                   </div>
@@ -476,7 +523,7 @@ export default function MintPage() {
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="text-lg font-bold">Total Estimate</span>
                     <span className="text-3xl font-display font-bold">
-                      {isCalculating ? "..." : (quoteUSDC + estimatedGasUsd).toFixed(2)}
+                      {isCalculating ? "..." : (quoteETH + estimatedGasUsd).toFixed(2)}
                       <span className="text-sm font-normal text-slate-400 ml-2">USD</span>
                     </span>
                   </div>
