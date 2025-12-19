@@ -10,12 +10,12 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-4 cursor-pointer">
               <Cpu className="w-5 h-5 text-primary" />
               <span className="font-mono font-bold text-lg">
-                AI Robot <span className="text-primary">ID</span>
+                Onchain <span className="text-primary">ID</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
               The decentralized registry standard for autonomous machine identity.
-              Securing the future of robot-human interaction on Base.
+              Securing the future of robot-human interaction on Ethereum.
             </p>
           </div>
 
@@ -36,7 +36,7 @@ export function Footer() {
               Connect
             </h4>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://x.com/onchain_id" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
@@ -53,7 +53,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground font-mono">
-          <p>© 2025 AI-Robot Registry. All rights reserved.</p>
+          <p>© 2025 Onchain ID. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-foreground">Privacy Policy</a>
             <a href="#" className="hover:text-foreground">Terms of Service</a>

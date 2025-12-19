@@ -77,7 +77,7 @@ export default function Home() {
       icon: Factory,
       title: "Industrial Workforce",
       subtitle: "Secure Manufacturing",
-      desc: "General-purpose humanoid workers need verified identities to operate on production lines and access restricted zones. Using AI Onchain ID, every humanoid unit has a unique on-chain identity that safety systems verify instantly, replacing the need for manual badge scans.",
+      desc: "General-purpose humanoid workers need verified identities to operate on production lines and access restricted zones. Using Onchain ID, every humanoid unit has a unique on-chain identity that safety systems verify instantly, replacing the need for manual badge scans.",
       tags: ["Access Control", "Safety Protocols", "Audit Logs"]
     },
     {
@@ -430,7 +430,7 @@ export default function Home() {
                   {
                     icon: Lock,
                     title: "Permissionless Security",
-                    text: "Built on Base and ENS, our registry is censorship-resistant and permanently accessible."
+                    text: "Built on Ethereum and ENS, our registry is censorship-resistant and permanently accessible."
                   },
                   {
                     icon: Server,
