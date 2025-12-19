@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPublicClient, http, formatUnits, formatEther, formatGwei, custom } from "viem";
-import { base } from "viem/chains";
+import { mainnet } from "viem/chains";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -73,7 +73,7 @@ export default function MintPage() {
     socials: string[]
   } | null>(null);
 
-  const { data: gasPrice } = useGasPrice({ chainId: 8453 });
+  const { data: gasPrice } = useGasPrice({ chainId: 1 });
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
@@ -208,8 +208,8 @@ export default function MintPage() {
     const fetchQuote = async () => {
       setIsCalculating(true);
       try {
-        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://mainnet.base.org");
-        const publicClient = createPublicClient({ chain: base, transport });
+        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
+        const publicClient = createPublicClient({ chain: mainnet, transport });
 
         const mintCostWei = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
