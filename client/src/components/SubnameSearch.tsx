@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { createPublicClient, http, custom } from "viem";
-import { namehash } from "viem/utils";
+import { namehash } from "viem/ens";
 import { mainnet } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

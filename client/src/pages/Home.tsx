@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table";
 
 import { SubnameSearch } from "@/components/SubnameSearch";
+import { LicenseModal } from "@/components/LicenseModal";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
