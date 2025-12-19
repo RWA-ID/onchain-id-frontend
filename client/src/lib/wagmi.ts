@@ -3,7 +3,7 @@ import { mainnet } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
   appName: 'Onchain ID',
-  projectId: '1c5877c6a51d28929e709977278356d2', // Valid testing Project ID
+  projectId: '3fcc6bba6f1de962d911bb5b5c3dba68', // Valid testing Project ID from docs
   chains: [mainnet],
   ssr: false,
 });
