@@ -355,7 +355,10 @@ export default function Home() {
                    </div>
                  </div>
 
-                 <Button className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-white mt-4" onClick={() => setLicenseModalOpen(true)}>
+                 <Button 
+                    className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-white mt-4 cursor-pointer" 
+                    onClick={() => setLicenseModalOpen(true)}
+                 >
                     Get License
                  </Button>
               </div>
