@@ -223,7 +223,7 @@ export default function Home() {
                       <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">2</span>
                       Volume Pricing Tiers
                    </h3>
-                   <div className="grid grid-cols-2 gap-4 ml-8">
+                   <div className="grid grid-cols-3 gap-4 ml-8">
                       <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
                         <div className="text-xs text-muted-foreground uppercase font-bold">Tier 0 (Starter)</div>
                         <div className="text-xl font-bold text-primary">$4.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
@@ -238,11 +238,6 @@ export default function Home() {
                         <div className="text-xs text-muted-foreground uppercase font-bold">Tier 2 (Scale)</div>
                         <div className="text-xl font-bold text-primary">$1.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
                         <div className="text-xs text-muted-foreground">51+ Units</div>
-                      </div>
-                      <div className="p-3 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-lg shadow-sm">
-                        <div className="text-xs text-primary uppercase font-bold">License</div>
-                        <div className="text-xl font-bold text-primary">Unlimited</div>
-                        <div className="text-xs text-muted-foreground">One-time Fee</div>
                       </div>
                    </div>
                 </div>
@@ -264,6 +259,95 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* Unlimited License Section */}
+      <section className="py-24 bg-slate-900 text-white relative overflow-hidden border-y border-white/10">
+        {/* Background Effects */}
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-[120px] rounded-full translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-1/2 h-full bg-blue-500/5 blur-[120px] rounded-full -translate-x-1/2" />
+
+        <div className="container px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center space-y-6 mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-bold">
+              Unlimited Issuance <span className="text-primary">License</span>
+            </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+              Own the license forever. Issue unlimited subdomains. Define the identity standard for your ecosystem.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Benefits List */}
+            <div className="space-y-8">
+               <div className="grid gap-6">
+                 {[
+                   {
+                     title: "Unlimited Subdomains (Forever)",
+                     desc: "Issue an unlimited number of subdomains under your licensed parent — permanently, with no expiration."
+                   },
+                   {
+                     title: "Lowest Effective Cost at Scale",
+                     desc: "Eliminate per-subdomain fees entirely and reduce issuance costs to near zero as usage grows."
+                   },
+                   {
+                     title: "Priority Dashboard Access",
+                     desc: "License holders unlock the full issuance dashboard with advanced bulk tools and controls."
+                   },
+                   {
+                     title: "Brand & Namespace Protection",
+                     desc: "Secure your namespace once and maintain long-term control over how identities are issued."
+                   },
+                   {
+                     title: "Enterprise-Grade Workflows",
+                     desc: "Designed for manufacturers, platforms, and OEMs issuing identities to devices, robots, vehicles, and teams."
+                   }
+                 ].map((item, i) => (
+                   <div key={i} className="flex gap-4">
+                     <div className="mt-1">
+                       <CheckCircle className="w-6 h-6 text-primary shrink-0" />
+                     </div>
+                     <div>
+                       <h3 className="font-bold text-lg text-white">{item.title}</h3>
+                       <p className="text-slate-400 text-sm leading-relaxed mt-1">{item.desc}</p>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+            </div>
+
+            {/* Price Card */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-br from-primary via-blue-500 to-purple-600 rounded-2xl blur opacity-30"></div>
+              <div className="relative bg-slate-800/50 backdrop-blur-xl border border-white/10 p-8 rounded-2xl space-y-8 text-center">
+                 <div className="space-y-2">
+                   <h3 className="text-sm font-mono text-primary uppercase tracking-wider font-bold">License Price</h3>
+                   <div className="text-6xl font-display font-bold text-white">$99,000</div>
+                   <p className="text-sm text-slate-400">One-time payment • Lifetime ownership</p>
+                 </div>
+                 
+                 <div className="space-y-4 pt-4 border-t border-white/5">
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-300">Asset Type</span>
+                      <span className="font-mono text-white">ERC-721 Token</span>
+                   </div>
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-300">Supply</span>
+                      <span className="font-mono text-white">Scarce & Appreciating</span>
+                   </div>
+                   <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-300">Network</span>
+                      <span className="font-mono text-white">Ethereum Mainnet</span>
+                   </div>
+                 </div>
+
+                 <Button className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-white mt-4" onClick={() => setLocation('/mint')}>
+                    Get License
+                 </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Feature Grid */}
       <section className="py-24 bg-background relative">
