@@ -46,11 +46,21 @@ import {
 
 import { SubnameSearch } from "@/components/SubnameSearch";
 import { LicenseModal } from "@/components/LicenseModal";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
   const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
+
+  const handleGetLicense = () => {
+    if (isConnected) {
+      setLicenseModalOpen(true);
+    } else {
+      openConnectModal?.();
+    }
+  };
 
   // Auto-redirect to mint dashboard if connected
   useEffect(() => {
@@ -294,7 +304,7 @@ export default function Home() {
 
                  <Button 
                     className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary/90 text-white mt-4 cursor-pointer" 
-                    onClick={() => setLicenseModalOpen(true)}
+                    onClick={handleGetLicense}
                  >
                     Get License
                  </Button>

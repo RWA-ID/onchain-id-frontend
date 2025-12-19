@@ -532,7 +532,7 @@ export default function MintPage() {
                       key={zone.name}
                       onClick={() => setSelectedZone(zone.name)}
                       className={`
-                        relative flex items-center p-4 cursor-pointer rounded-xl border-2 transition-all duration-200
+                        relative flex items-center p-4 cursor-pointer rounded-xl border-2 transition-all duration-200 active:scale-98 touch-manipulation
                         ${selectedZone === zone.name 
                           ? `border-primary bg-primary/5 shadow-md` 
                           : "border-transparent bg-white hover:bg-gray-50 hover:border-gray-200 border-gray-100"

@@ -197,53 +197,11 @@ export function LicenseModal({ open, onOpenChange }: LicenseModalProps) {
         </DialogHeader>
 
         {!isConnected ? (
-          <div className="py-8 flex justify-center">
-            <ConnectButton.Custom>
-              {({
-                account,
-                chain,
-                openAccountModal,
-                openChainModal,
-                openConnectModal,
-                authenticationStatus,
-                mounted,
-              }) => {
-                const ready = mounted && authenticationStatus !== 'loading';
-                const connected =
-                  ready &&
-                  account &&
-                  chain &&
-                  (!authenticationStatus ||
-                    authenticationStatus === 'authenticated');
-
-                return (
-                  <div
-                    {...(!ready && {
-                      'aria-hidden': true,
-                      'style': {
-                        opacity: 0,
-                        pointerEvents: 'none',
-                        userSelect: 'none',
-                      },
-                    })}
-                  >
-                    {(() => {
-                      if (!connected) {
-                        return (
-                          <Button 
-                            onClick={openConnectModal} 
-                            className="w-full h-12 bg-primary hover:bg-primary/90 text-lg font-bold"
-                          >
-                            Connect Wallet to Continue
-                          </Button>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                );
-              }}
-            </ConnectButton.Custom>
+          <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-4 rounded-full bg-slate-800">
+               <ShieldCheck className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-slate-400">Please connect your wallet to purchase a license.</p>
           </div>
         ) : (
           <div className="space-y-6 py-4">
@@ -263,7 +221,7 @@ export function LicenseModal({ open, onOpenChange }: LicenseModalProps) {
                             key={zone}
                             onClick={() => setSelectedZone(zone)}
                             className={`
-                                flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all
+                                flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all active:scale-98 touch-manipulation
                                 ${isSelected 
                                     ? "border-primary bg-primary/10" 
                                     : "border-slate-800 bg-slate-800/50 hover:border-slate-700"
