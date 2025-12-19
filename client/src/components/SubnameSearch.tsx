@@ -166,7 +166,7 @@ export function SubnameSearch() {
   const Icon = NAMESPACE_ICONS[namespace] || Bot;
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 relative z-20 -mt-8">
+    <div className="w-full max-w-3xl mx-auto px-4 relative z-20">
       <Card className="bg-white/90 backdrop-blur-xl border-white/20 shadow-2xl overflow-visible ring-1 ring-black/5">
         <CardContent className="p-6 md:p-8 space-y-6">
             

@@ -121,7 +121,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm max-w-5xl mx-auto"
+              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm max-w-5xl mx-auto mb-16"
             >
               Decentralized Identity For <br />
               <span className="text-primary">
@@ -129,15 +129,19 @@ export default function Home() {
               </span>
             </motion.h1>
 
-            <div className="pb-12" /> {/* Spacer for search box */}
+            {/* Subname Search Component */}
+            <motion.div
+               initial={{ opacity: 0, y: 30 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.8, delay: 0.3 }}
+            >
+               <SubnameSearch />
+            </motion.div>
 
           </div>
         </div>
       </section>
       
-      {/* Subname Search Component */}
-      <SubnameSearch />
-
       {/* Bulk Minting Visualization Section */}
       <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
         <div className="container px-6">
