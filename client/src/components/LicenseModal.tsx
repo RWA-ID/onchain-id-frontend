@@ -220,8 +220,10 @@ export function LicenseModal({ open, onOpenChange }: LicenseModalProps) {
                         <div
                             key={zone}
                             onClick={() => setSelectedZone(zone)}
+                            role="button"
+                            tabIndex={0}
                             className={`
-                                flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all active:scale-98 touch-manipulation
+                                flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all active:scale-98 touch-manipulation focus:outline-none focus:ring-2 focus:ring-primary/50
                                 ${isSelected 
                                     ? "border-primary bg-primary/10" 
                                     : "border-slate-800 bg-slate-800/50 hover:border-slate-700"

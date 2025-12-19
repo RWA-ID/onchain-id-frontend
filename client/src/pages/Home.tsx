@@ -58,7 +58,9 @@ export default function Home() {
     if (isConnected) {
       setLicenseModalOpen(true);
     } else {
-      openConnectModal?.();
+      if (openConnectModal) {
+        openConnectModal();
+      }
     }
   };
 
