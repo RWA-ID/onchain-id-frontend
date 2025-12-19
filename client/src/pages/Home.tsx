@@ -44,8 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { MintCalculator } from "@/components/MintCalculator"; // Keep if needed or remove if unused, but we need LicenseModal
-import { LicenseModal } from "@/components/LicenseModal"; // Add this
+import { SubnameSearch } from "@/components/SubnameSearch";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
@@ -129,81 +128,14 @@ export default function Home() {
               </span>
             </motion.h1>
 
-            <motion.p 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium"
-            >
-              Give every autonomous machine a secure, verifiable, and portable digital identity onchain.
-            </motion.p>
+            <div className="pb-12" /> {/* Spacer for search box */}
 
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
-            >
-              <ConnectButton.Custom>
-                {({
-                  account,
-                  chain,
-                  openAccountModal,
-                  openChainModal,
-                  openConnectModal,
-                  authenticationStatus,
-                  mounted,
-                }) => {
-                  const ready = mounted && authenticationStatus !== 'loading';
-                  const connected =
-                    ready &&
-                    account &&
-                    chain &&
-                    (!authenticationStatus ||
-                      authenticationStatus === 'authenticated');
-
-                  return (
-                    <div
-                      {...(!ready && {
-                        'aria-hidden': true,
-                        'style': {
-                          opacity: 0,
-                          pointerEvents: 'none',
-                          userSelect: 'none',
-                        },
-                      })}
-                    >
-                      {(() => {
-                        if (!connected) {
-                          return (
-                            <Button 
-                              onClick={openConnectModal}
-                              className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              START MINTING
-                            </Button>
-                          );
-                        }
-                        
-                        // If connected, scroll to calculator or show "Connected" state
-                        return (
-                          <Button 
-                            onClick={() => setLocation('/mint')}
-                            className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono rounded-none text-lg"
-                          >
-                             MINTING DASHBOARD
-                          </Button>
-                        );
-                      })()}
-                    </div>
-                  );
-                }}
-              </ConnectButton.Custom>
-            </motion.div>
           </div>
         </div>
       </section>
+      
+      {/* Subname Search Component */}
+      <SubnameSearch />
 
       {/* Bulk Minting Visualization Section */}
       <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
