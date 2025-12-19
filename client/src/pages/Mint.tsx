@@ -135,6 +135,20 @@ export default function MintPage() {
 
       } catch (e) {
         console.error("Failed to fetch parents", e);
+        // Fallback to hardcoded zones if contract call fails
+        const fallbackZones = [
+          "robot-id.eth",
+          "machine-id.eth",
+          "device-id.eth",
+          "drone-id.eth",
+          "vehicle-id.eth"
+        ];
+        const zones = fallbackZones.map(p => ({
+          name: p,
+          label: p.split('.')[0], 
+          icon: ZONE_ICONS[p] || Bot
+        }));
+        setAvailableZones(zones);
       } finally {
         setIsLoadingZones(false);
       }

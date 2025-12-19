@@ -108,6 +108,21 @@ export function LicenseModal({ open, onOpenChange }: LicenseModalProps) {
 
       } catch (e) {
         console.error("Failed to fetch license data", e);
+        // Fallback
+        const fallbackZones = [
+          "robot-id.eth",
+          "machine-id.eth",
+          "device-id.eth",
+          "drone-id.eth",
+          "vehicle-id.eth"
+        ];
+        setZones(fallbackZones);
+        if (!selectedZone) setSelectedZone(fallbackZones[0]);
+        
+        // Fallback price if fails ($99,000 * 1e18 roughly)
+        setLicensePriceUSD(BigInt(99000) * BigInt(1e18));
+        setEthPrice(BigInt(3000) * BigInt(1e8)); // Mock $3000 ETH
+        
       } finally {
         setIsLoading(false);
       }
