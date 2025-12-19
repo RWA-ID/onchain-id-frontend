@@ -32,7 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
-import { ABI } from "@/lib/abi";
+import { ABI, NAME_WRAPPER_ABI, CHAINLINK_ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 
 // Updated Zone Definition based on contract "parents" logic (assumed)
@@ -167,39 +167,104 @@ export default function MintPage() {
     const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
     const publicClient = createPublicClient({ chain: mainnet, transport });
     
-    // Calculate price again to be safe
-    let totalPrice = BigInt(0);
+    // Calculate price in ETH
+    let valueToSend = BigInt(0);
     try {
-      const tierPrice = await publicClient.readContract({
+      // 1. Get Price in USD from Contract (assumed 18 decimals)
+      const tierPriceUSD = await publicClient.readContract({
         address: CONTRACT_ADDRESS as `0x${string}`,
         abi: ABI,
         functionName: 'tierPricesUSD',
         args: [BigInt(quantity)]
       }) as bigint;
       
-      // Note: The contract returns price in USD (assumed 18 decimals or 6? Need to verify oracle logic)
-      // Since `registerBulk` is payable, we might need to send ETH equivalent. 
-      // HOWEVER, the ABI shows `registerBulk` is payable. 
-      // If the contract uses Chainlink ETH/USD oracle inside, it will expect msg.value >= price in ETH.
-      
-      // For now, let's assume the contract handles the conversion or we just send 0 if it pulls USDC?
-      // Wait, the ABI has "tierPricesUSD". The function `registerBulk` is payable.
-      // Usually this means we need to send ETH. 
-      // Let's assume we need to calculate ETH required.
-      // WITHOUT explicit oracle reading on frontend, this is tricky.
-      // Let's try to call it with 0 value first or check if there's a view function for ETH price? No.
-      
-      // FALLBACK: Just call the function. If it reverts, we might need to send value.
-      // Given it's a "License" model, maybe we buy license first then register?
-      // ABI has `buyLicense` and `registerBulk`.
-      // `buyLicense` is payable. `registerBulk` is payable.
-      
-      // Let's assume `registerBulk` covers everything if we send enough ETH.
-      // For this mockup, I'll pass 0 value unless we know better.
-      // Actually, let's update this to just call `registerBulk` with the params.
-      
+      const totalUSD = tierPriceUSD * BigInt(quantity); // Total USD cost
+
+      if (totalUSD > BigInt(0)) {
+        // 2. Get Oracle Address
+        const oracleAddress = await publicClient.readContract({
+          address: CONTRACT_ADDRESS as `0x${string}`,
+          abi: ABI,
+          functionName: 'oracle'
+        }) as `0x${string}`;
+
+        // 3. Get ETH/USD Price from Oracle
+        const [, answer, , , ] = await publicClient.readContract({
+          address: oracleAddress,
+          abi: CHAINLINK_ABI,
+          functionName: 'latestRoundData'
+        }) as [bigint, bigint, bigint, bigint, bigint];
+
+        const ethPriceUSD = answer; // Chainlink usually 8 decimals for USD pairs
+
+        // 4. Calculate required ETH
+        // Formula: (TotalUSD * 1e18) / (ETH_USD_Rate)
+        // Adjust for decimals:
+        // TotalUSD is 18 decimals ($1 = 1e18)
+        // ETH_USD is 8 decimals ($3000 = 3000e8)
+        // We want Wei (18 decimals)
+        // Value = (TotalUSD * 10^8) / ETH_USD_Rate  <-- If TotalUSD is 18 decimals
+        // Let's verify decimals.
+        // If Price is $10 (10 * 1e18). Rate is $2000 (2000 * 1e8).
+        // 10 * 1e18 / 2000 * 1e8 = (10/2000) * 1e10 = 0.005 * 1e10 ... wait.
+        // 1 ETH = 1e18 Wei.
+        // $10 worth of ETH at $2000/ETH = 0.005 ETH = 5e15 Wei.
+        // Calculation: (10 * 1e18) * ? / (2000 * 1e8)
+        // To get 5e15:
+        // (10 * 1e18 * 1e8) / (2000 * 1e8) = 5e15
+        // Correct Formula: (TotalUSD_18dec * 10^Wei_Decimals) / (Rate_8dec * 10^10) ?? No.
+        
+        // Let's use standard conversion:
+        // ValueWei = (AmountUSD * 1e26) / RateUSD (if Rate is 8 decimals)
+        // Example: $2000 ETH price. Rate = 2000e8.
+        // Target: $1 (1e18).
+        // Wei = (1e18 * 1e26) / 2000e8 = 1e44 / 2000e8 = 0.0005 * 1e36 ... wrong.
+        
+        // Let's stick to base units.
+        // 1 ETH = PriceInUSD
+        // 1 Wei = PriceInUSD / 1e18
+        // X Wei = TargetUSD
+        // X * (Rate / 1e8) = TargetUSD / 1e18 (if Target is 18 decimals??)
+        // Wait, standard is:
+        // value = (usdAmount * 1e8) / ethPrice ?
+        // If usdAmount is $1 (1e18), ethPrice is $2000 (2000e8).
+        // value = (1e18 * 1e8) / 2000e8 = 1e18 / 2000 = 5e14 Wei = 0.0005 ETH. Correct.
+        // So simply: (TotalUSD_18dec * 1e8) / Rate_8dec? No, that cancels out 1e8.
+        // (1e18) / 2000e8 ... units don't match.
+        
+        // Correct logic:
+        // We have USD amount with 18 decimals (1e18 = $1).
+        // We have ETH price with 8 decimals (1e8 = $1 ?? No, 2000e8 = $2000).
+        // We want ETH amount in Wei (1e18 = 1 ETH).
+        
+        // Value (in ETH) = TotalUSD / ETHPrice
+        // Value (in Wei) = (TotalUSD_18dec / 1e18) / (ETHPrice_8dec / 1e8) * 1e18
+        //                = (TotalUSD_18dec * 1e8) / ETHPrice_8dec
+        // Example: $2000 cost. TotalUSD = 2000e18. Rate = 2000e8.
+        // (2000e18 * 1e8) / 2000e8 = 2000e18 = 1 ETH. Correct?
+        // Wait, if cost is $2000 and ETH is $2000, we need 1 ETH.
+        // 2000e18 is $2000 (if 18 decimals).
+        // 2000e8 is $2000 (if 8 decimals).
+        // (2000e18 * ? ) / 2000e8 = 1e18.
+        // 2000e18 / 2000e8 = 1e10.
+        // We need 1e18. So multiply by 1e8.
+        // Formula: (TotalUSD_18dec * 1e8) / Rate_8dec. -> Returns Wei.
+        
+        // Safety margin: Add small buffer? The contract might recalculate and if rate shifts slightly... 
+        // Usually good to add 1-2% buffer or just let it be exact if single block.
+        // Contract usually takes ETH and refunds excess or requires exact.
+        // Assuming exact for now.
+        
+        valueToSend = (totalUSD * BigInt(1e8)) / ethPriceUSD;
+        
+        // Add 1% buffer for price fluctuations
+        valueToSend = (valueToSend * BigInt(101)) / BigInt(100);
+      }
+
     } catch (e) {
-      console.error("Price fetch failed", e);
+      console.error("Price calc failed", e);
+      // Fallback: If calculation fails, maybe send 0 and let wallet estimate or fail?
+      // Better to stop? Or try 0.
     }
 
 
@@ -217,6 +282,7 @@ export default function MintPage() {
             RESOLVER_ADDRESS as `0x${string}`, // resolver
             BigInt(0)             // ttl (0 = use default)
           ],
+          value: valueToSend
         });
     } else {
         if (!parsedData) return;
@@ -232,6 +298,7 @@ export default function MintPage() {
             RESOLVER_ADDRESS as `0x${string}`, // resolver
             BigInt(0)               // ttl
           ],
+          value: valueToSend
         });
     }
   };

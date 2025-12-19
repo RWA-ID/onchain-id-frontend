@@ -116,3 +116,42 @@ export const ABI = [
     "type": "function"
   }
 ] as const;
+
+export const NAME_WRAPPER_ABI = [
+  {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "operator", "type": "address" }
+    ],
+    "name": "isApprovedForAll",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" },
+      { "internalType": "bool", "name": "approved", "type": "bool" }
+    ],
+    "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+] as const;
+
+export const CHAINLINK_ABI = [
+  {
+    "inputs": [],
+    "name": "latestRoundData",
+    "outputs": [
+      { "internalType": "uint80", "name": "", "type": "uint80" },
+      { "internalType": "int256", "name": "", "type": "int256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint80", "name": "", "type": "uint80" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+] as const;
