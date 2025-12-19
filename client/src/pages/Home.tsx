@@ -194,30 +194,63 @@ export default function Home() {
       <section className="py-24 border-y border-border/40 bg-white/50 backdrop-blur-sm">
         <div className="container px-6">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-5 space-y-6">
-              <h2 className="text-3xl md:text-4xl font-display font-bold">
-                <span className="text-primary">Bulk Minting</span> Workflow
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Register thousands of robot identities in seconds. Simply upload a CSV file with your fleet's details.
-                First come, first serve.
-              </p>
-              <ul className="space-y-4 pt-4">
-                {[
-                  "Choose robot-id.eth, machine-id.eth, device-id.eth, drone-id.eth, or vehicle-id.eth",
-                  "CSV Upload (6 columns)",
-                  "Instant on-chain registration",
-                  "Full ownership & control"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-mono text-foreground/80">
-                    <CheckCircle className="w-4 h-4 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+            <div className="lg:col-span-6 space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-display font-bold">
+                  <span className="text-primary">Bulk Minting</span> Workflow
+                </h2>
+                <p className="text-muted-foreground text-lg">
+                  Register thousands of robot identities in seconds with our streamlined process.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                   <h3 className="font-bold font-mono text-lg flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">1</span>
+                      Workflow Steps
+                   </h3>
+                   <ul className="ml-8 space-y-2 text-sm text-muted-foreground">
+                      <li>• Connect Wallet & Select Zone (Robot, Drone, etc.)</li>
+                      <li>• Upload CSV Fleet Data or Enter Single Name</li>
+                      <li>• Automatic Pricing Calculation (Chainlink Oracle)</li>
+                      <li>• Confirm Transaction & Receive Onchain IDs</li>
+                   </ul>
+                </div>
+
+                <div className="space-y-2">
+                   <h3 className="font-bold font-mono text-lg flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">2</span>
+                      Volume Pricing Tiers
+                   </h3>
+                   <div className="grid grid-cols-2 gap-4 ml-8">
+                      <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 0 (Starter)</div>
+                        <div className="text-xl font-bold text-primary">$4.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
+                        <div className="text-xs text-muted-foreground">1 - 10 Units</div>
+                      </div>
+                      <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 1 (Growth)</div>
+                        <div className="text-xl font-bold text-primary">$3.00 <span className="text-xs text-muted-foreground">/ ID</span></div>
+                        <div className="text-xs text-muted-foreground">11 - 50 Units</div>
+                      </div>
+                      <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 2 (Scale)</div>
+                        <div className="text-xl font-bold text-primary">$1.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
+                        <div className="text-xs text-muted-foreground">51+ Units</div>
+                      </div>
+                      <div className="p-3 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-lg shadow-sm">
+                        <div className="text-xs text-primary uppercase font-bold">License</div>
+                        <div className="text-xl font-bold text-primary">Unlimited</div>
+                        <div className="text-xs text-muted-foreground">One-time Fee</div>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
             </div>
 
-            <div className="lg:col-span-7 relative group">
+            <div className="lg:col-span-6 relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition duration-1000"></div>
               <div className="relative rounded-lg border border-border bg-white p-1 shadow-2xl overflow-hidden">
                 <img 
@@ -228,13 +261,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-24 bg-gray-50 border-y border-border">
-        <div className="container px-6 max-w-5xl mx-auto text-center space-y-12">
-           <MintCalculator />
         </div>
       </section>
 
