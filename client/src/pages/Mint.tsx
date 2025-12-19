@@ -51,12 +51,27 @@ const GAS_PER_UNIT = BigInt(45000);
 // Public Resolver Address (from user provided info)
 const RESOLVER_ADDRESS = "0xF29100983E058B709F3D539b0c765937B804AC15";
 
+import { LicenseModal } from "@/components/LicenseModal";
+
 export default function MintPage() {
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   
+  // License Modal State
+  const [licenseModalOpen, setLicenseModalOpen] = useState(false);
+
+  // Check for license action in URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("action") === "license") {
+      setLicenseModalOpen(true);
+      // Clean up URL
+      window.history.replaceState(null, "", "/mint");
+    }
+  }, []);
+
   // Dynamic Parent Labels
   const [availableZones, setAvailableZones] = useState<{name: string, label: string, icon: any}[]>([]);
   const [isLoadingZones, setIsLoadingZones] = useState(true);
@@ -496,14 +511,27 @@ export default function MintPage() {
       <div className="max-w-5xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="text-center space-y-4 mb-12">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900">
-            Mint Onchain Identities
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Select your namespace, upload your fleet data, and register authenticated identities in bulk.
-          </p>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+          <div className="text-center md:text-left space-y-4">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900">
+              Mint Onchain Identities
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl">
+              Select your namespace, upload your fleet data, and register authenticated identities in bulk.
+            </p>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="h-12 border-primary/20 hover:border-primary text-primary font-bold gap-2 shadow-sm"
+            onClick={() => setLicenseModalOpen(true)}
+          >
+            <Crown className="w-5 h-5" />
+            Buy Unlimited License
+          </Button>
         </div>
+
+        <LicenseModal open={licenseModalOpen} onOpenChange={setLicenseModalOpen} />
 
         <div className="grid lg:grid-cols-12 gap-8">
           

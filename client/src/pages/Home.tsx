@@ -56,8 +56,11 @@ export default function Home() {
 
   const handleGetLicense = () => {
     if (isConnected) {
-      setLicenseModalOpen(true);
+      // If already connected, redirect to mint page with license action
+      setLocation("/mint?action=license");
     } else {
+      // Set intent for after connection
+      sessionStorage.setItem("connect_intent", "license");
       if (openConnectModal) {
         openConnectModal();
       }
@@ -66,22 +69,15 @@ export default function Home() {
 
   // Auto-redirect to mint dashboard if connected
   useEffect(() => {
-    // We might want to disable auto-redirect if we want users to see the landing page and buy license?
-    // User requirement: "Redirect user to Dashboard" AFTER license purchase.
-    // Existing code redirects automatically on connect.
-    // If we auto-redirect, user can't click "Get License" on Home if they are already connected.
-    // Maybe we should remove this auto-redirect or make it smarter?
-    // The prompt says: "If wallet is not connected, prompt Connect Wallet. After connection, show: Parent selector..."
-    // If I redirect immediately, they go to Mint page.
-    
-    // Let's REMOVE the auto-redirect effect for now to allow interaction with Home page buttons,
-    // OR allow the Mint page to handle it? 
-    // Actually, "Get License" button is on Home page.
-    // If I am connected, I should be able to click it.
-    // So auto-redirect prevents me from seeing Home page.
-    
-    // I will remove the auto-redirect effect to allow full landing page experience.
-    // Users can click "Minting Dashboard" (which I added in previous step) to go to /mint.
+    if (isConnected) {
+      const intent = sessionStorage.getItem("connect_intent");
+      if (intent === "license") {
+        sessionStorage.removeItem("connect_intent");
+        setLocation("/mint?action=license");
+      } else {
+        setLocation("/mint");
+      }
+    }
   }, [isConnected, setLocation]);
 
   const cases = [
