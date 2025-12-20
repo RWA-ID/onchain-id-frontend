@@ -43,6 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { ABI, NAME_WRAPPER_ABI, CHAINLINK_ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { LicenseModal } from "@/components/LicenseModal";
 
 // Zone Definition with icon mapping
 const ZONE_ICONS: Record<string, any> = {
@@ -59,8 +60,6 @@ const GAS_PER_UNIT = BigInt(45000);
 // Public Resolver Address (from user provided info)
 const RESOLVER_ADDRESS = "0xF29100983E058B709F3D539b0c765937B804AC15";
 
-import { LicenseModal } from "@/components/LicenseModal";
-
 export default function MintPage() {
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
@@ -73,17 +72,16 @@ export default function MintPage() {
   // Check for license action or minting intent in URL
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    
-    // Handle License Action
-    if (searchParams.get("action") === "license") {
-      setLicenseModalOpen(true);
-      window.history.replaceState(null, "", "/mint");
-    }
-    
-    // Handle Minting Intent (from SubnameSearch)
+    const actionParam = searchParams.get("action");
     const namespaceParam = searchParams.get("namespace");
     const labelParam = searchParams.get("label");
     
+    // Handle License Action
+    if (actionParam === "license") {
+      setLicenseModalOpen(true);
+    }
+    
+    // Handle Minting Intent (from SubnameSearch)
     if (namespaceParam) {
         setSelectedZone(namespaceParam);
         
@@ -91,15 +89,14 @@ export default function MintPage() {
             setMintMode("single");
             setSingleName(labelParam);
         }
-        
-        // Clean URL but maybe keep params for a bit? No, better clean to avoid re-triggering.
+    }
+    
+    // Only clean URL if connected to preserve params across potential wallet-connect reloads
+    if (isConnected && (actionParam || namespaceParam)) {
         window.history.replaceState(null, "", "/mint");
     }
-  }, [availableZones]); // Depend on availableZones to ensure we can select it? 
-  // Actually, setSelectedZone just sets string, so it should be fine even if zones aren't loaded yet,
-  // provided the UI handles selectedZone matching availableZones correctly or state is independent.
-  // In our UI, `selectedZone` is just a string state.
-  
+  }, [isConnected]);
+
   // Dynamic Parent Labels
   const [availableZones, setAvailableZones] = useState<{name: string, label: string, icon: any}[]>([]);
   const [isLoadingZones, setIsLoadingZones] = useState(true);
