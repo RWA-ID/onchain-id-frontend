@@ -70,16 +70,36 @@ export default function MintPage() {
   // License Modal State
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
 
-  // Check for license action in URL
+  // Check for license action or minting intent in URL
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
+    
+    // Handle License Action
     if (searchParams.get("action") === "license") {
       setLicenseModalOpen(true);
-      // Clean up URL
       window.history.replaceState(null, "", "/mint");
     }
-  }, []);
-
+    
+    // Handle Minting Intent (from SubnameSearch)
+    const namespaceParam = searchParams.get("namespace");
+    const labelParam = searchParams.get("label");
+    
+    if (namespaceParam) {
+        setSelectedZone(namespaceParam);
+        
+        if (labelParam) {
+            setMintMode("single");
+            setSingleName(labelParam);
+        }
+        
+        // Clean URL but maybe keep params for a bit? No, better clean to avoid re-triggering.
+        window.history.replaceState(null, "", "/mint");
+    }
+  }, [availableZones]); // Depend on availableZones to ensure we can select it? 
+  // Actually, setSelectedZone just sets string, so it should be fine even if zones aren't loaded yet,
+  // provided the UI handles selectedZone matching availableZones correctly or state is independent.
+  // In our UI, `selectedZone` is just a string state.
+  
   // Dynamic Parent Labels
   const [availableZones, setAvailableZones] = useState<{name: string, label: string, icon: any}[]>([]);
   const [isLoadingZones, setIsLoadingZones] = useState(true);
