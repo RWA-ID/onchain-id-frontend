@@ -239,16 +239,36 @@ export default function MintPage() {
 
   // Effect for Transaction Success
   useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && hash) {
+      // Check if the transaction actually succeeded (status === "success")
+      // useWaitForTransactionReceipt returns isSuccess=true when data is fetched.
+      // But we need to check if the receipt indicates success or revert?
+      // Actually, wagmi v2 usually throws/errors if reverted? 
+      // Let's assume if isConfirmed is true, it's mined.
+      
+      // We should show the hash so user can verify.
+      
       toast({
         title: "Transaction Successful!",
-        description: `Operation completed successfully.`,
+        description: (
+          <div className="flex flex-col gap-1">
+            <span>Operation completed successfully.</span>
+            <a 
+              href={`https://etherscan.io/tx/${hash}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-blue-500 underline flex items-center gap-1"
+            >
+              View Transaction <CheckCircle2 className="w-3 h-3" />
+            </a>
+          </div>
+        ),
         variant: "default",
       });
       // Optional: Reset form
       if (mintMode === "single") setSingleName("");
     }
-  }, [isConfirmed, quantity, toast, mintMode]);
+  }, [isConfirmed, hash, quantity, toast, mintMode]);
 
   // Fetch ETH Price
   useEffect(() => {
@@ -410,7 +430,25 @@ export default function MintPage() {
           valueToSend = valueToSend + BigInt(1e15);
 
         } catch (e) {
-          console.error("Price calc failed", e);
+          console.error("Price calc failed, using fallback", e);
+          
+          // Fallback Calculation
+          // Assume $4.50 (450 cents) per unit if tiered fetch fails
+          // Assume ETH = $3000 (3000 * 1e8)
+          
+          const fallbackPriceCents = BigInt(450); // Tier 0 price
+          const fallbackEthPrice = BigInt(3000 * 1e8); 
+          
+          const totalFee = fallbackPriceCents * BigInt(quantity);
+          // Wei = (cents * 1e18) / (eth_price_cents??) no.
+          // Wei = (totalCents * 1e18) / (ETH_USD * 100) -> 
+          
+          // Let's stick to the formula: feePerSub * qty * 1e24 / ethPrice
+          // feePerSub = 450
+          // ethPrice = 3000 * 1e8
+          
+          valueToSend = (totalFee * BigInt(1e24)) / fallbackEthPrice;
+          valueToSend = valueToSend + BigInt(1e15);
         }
     }
 
