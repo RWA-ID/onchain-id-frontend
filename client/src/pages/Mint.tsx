@@ -22,6 +22,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPublicClient, http, formatUnits, formatEther, formatGwei, custom } from "viem";
 import { mainnet } from "viem/chains";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -100,6 +108,10 @@ export default function MintPage() {
     websites: string[],
     socials: string[]
   } | null>(null);
+
+  // Success Modal State
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastMintedTx, setLastMintedTx] = useState<string>("");
 
   const { data: gasPrice } = useGasPrice({ chainId: 1 });
   const { writeContract, data: hash, isPending } = useWriteContract();
@@ -293,35 +305,13 @@ export default function MintPage() {
   // Effect for Transaction Success
   useEffect(() => {
     if (isConfirmed && hash) {
-      // Check if the transaction actually succeeded (status === "success")
-      // useWaitForTransactionReceipt returns isSuccess=true when data is fetched.
-      // But we need to check if the receipt indicates success or revert?
-      // Actually, wagmi v2 usually throws/errors if reverted? 
-      // Let's assume if isConfirmed is true, it's mined.
+      setLastMintedTx(hash);
+      setShowSuccessModal(true);
       
-      // We should show the hash so user can verify.
-      
-      toast({
-        title: "Transaction Successful!",
-        description: (
-          <div className="flex flex-col gap-1">
-            <span>Operation completed successfully.</span>
-            <a 
-              href={`https://etherscan.io/tx/${hash}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-blue-500 underline flex items-center gap-1"
-            >
-              View Transaction <CheckCircle2 className="w-3 h-3" />
-            </a>
-          </div>
-        ),
-        variant: "default",
-      });
-      // Optional: Reset form
+      // Reset form but keep quantity context for the success message until closed
       if (mintMode === "single") setSingleName("");
     }
-  }, [isConfirmed, hash, quantity, toast, mintMode]);
+  }, [isConfirmed, hash, mintMode]);
 
   // Fetch ETH Price
   useEffect(() => {
@@ -642,6 +632,75 @@ export default function MintPage() {
         </div>
 
         <LicenseModal open={licenseModalOpen} onOpenChange={setLicenseModalOpen} />
+
+        {/* Success Modal */}
+        <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <DialogContent className="sm:max-w-md bg-white text-slate-900 border-border">
+            <DialogHeader className="flex flex-col items-center text-center space-y-4 pt-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-8 h-8 text-green-600" />
+              </div>
+              <DialogTitle className="text-2xl font-display font-bold">
+                Mint Successful!
+              </DialogTitle>
+              <DialogDescription className="text-lg text-slate-600 max-w-xs">
+                {mintMode === "single" && quantity === 1 ? (
+                   <span>
+                     You are now the owner of <br/>
+                     <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">
+                       {singleName || "your identity"}
+                       {!singleName.endsWith(selectedZone || "") && selectedZone ? `.${selectedZone}` : ""}
+                     </span>
+                   </span>
+                ) : (
+                   <span>
+                     You have successfully minted <br/>
+                     <span className="font-bold text-slate-900">{quantity} new identities</span>
+                   </span>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-6 space-y-4">
+               <div className="p-4 bg-slate-50 rounded-lg border border-slate-100 text-sm space-y-2">
+                 <div className="flex justify-between text-slate-500">
+                   <span>Transaction Hash</span>
+                   <span className="font-mono text-xs">{lastMintedTx ? `${lastMintedTx.slice(0, 6)}...${lastMintedTx.slice(-4)}` : "..."}</span>
+                 </div>
+                 <div className="flex justify-between text-slate-500">
+                   <span>Namespace</span>
+                   <span className="font-medium text-slate-900">{selectedZone}</span>
+                 </div>
+                 <div className="flex justify-between text-slate-500">
+                   <span>Status</span>
+                   <span className="text-green-600 font-bold flex items-center gap-1">
+                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                     Confirmed
+                   </span>
+                 </div>
+               </div>
+
+               <a 
+                 href={`https://etherscan.io/tx/${lastMintedTx}`}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="flex items-center justify-center gap-2 w-full p-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+               >
+                 View on Etherscan
+                 <CheckCircle2 className="w-4 h-4" />
+               </a>
+            </div>
+
+            <DialogFooter className="sm:justify-center">
+              <Button 
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12"
+              >
+                Done
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="grid lg:grid-cols-12 gap-8">
           
