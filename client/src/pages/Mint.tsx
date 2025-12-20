@@ -115,22 +115,75 @@ export default function MintPage() {
         const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
         const publicClient = createPublicClient({ chain: mainnet, transport });
         
-        const parents = await publicClient.readContract({
-          address: CONTRACT_ADDRESS as `0x${string}`,
-          abi: ABI,
-          functionName: 'parents'
-        }) as string[];
-
-        const zones = parents.map(p => ({
-          name: p,
-          label: p.split('.')[0], // e.g. "robot-id"
-          icon: ZONE_ICONS[p] || Bot
-        }));
+        let zones: { name: string; label: string; icon: any; }[] = [];
+        
+        try {
+            // Try fetching as array first
+            const parents = await publicClient.readContract({
+                address: CONTRACT_ADDRESS as `0x${string}`,
+                abi: ABI,
+                functionName: 'parents'
+            }) as string[];
+            
+            zones = parents.map(p => ({
+                name: p,
+                label: p.split('.')[0],
+                icon: ZONE_ICONS[p] || Bot
+            }));
+        } catch (e) {
+            console.log("Fetching parents() array failed, trying index...", e);
+            try {
+                // Try fetching by index
+                const fetchedZones: string[] = [];
+                let index = 0;
+                while (true) {
+                    try {
+                        const p = await publicClient.readContract({
+                            address: CONTRACT_ADDRESS as `0x${string}`,
+                            abi: ABI,
+                            functionName: 'parents',
+                            args: [BigInt(index)]
+                        }) as string;
+                        if (!p) break;
+                        fetchedZones.push(p);
+                        index++;
+                    } catch (err) {
+                        break; // Stop on error (likely out of bounds)
+                    }
+                }
+                
+                if (fetchedZones.length > 0) {
+                     zones = fetchedZones.map(p => ({
+                        name: p,
+                        label: p.split('.')[0],
+                        icon: ZONE_ICONS[p] || Bot
+                    }));
+                } else {
+                    throw new Error("No parents found by index");
+                }
+            } catch (fallbackError) {
+                console.error("All parent fetch methods failed", fallbackError);
+                // Fallback to hardcoded zones
+                const fallbackZones = [
+                  "robot-id.eth",
+                  "machine-id.eth",
+                  "device-id.eth",
+                  "drone-id.eth",
+                  "vehicle-id.eth"
+                ];
+                zones = fallbackZones.map(p => ({
+                  name: p,
+                  label: p.split('.')[0], 
+                  icon: ZONE_ICONS[p] || Bot
+                }));
+            }
+        }
+        
         setAvailableZones(zones);
         
         // Auto select first if available
         if (zones.length > 0 && !selectedZone) {
-          // Optional: setSelectedZone(zones[0].name);
+             // Optional: setSelectedZone(zones[0].name);
         }
 
       } catch (e) {
@@ -393,9 +446,7 @@ export default function MintPage() {
           if (quantity <= 10) tierIndex = 0;
           else if (quantity <= 50) tierIndex = 1;
           
-          // 2. Get Tier Price (cents, 2 decimals? or directly 18 dec value?)
-          // User said: 450, 300, 150 = cents with 2 decimals ($4.50)
-          // Contract `tierPricesUSD(index)` returns this value.
+          // 2. Get Tier Price (cents)
           const tierPriceCents = await publicClient.readContract({
             address: CONTRACT_ADDRESS as `0x${string}`,
             abi: ABI,
@@ -403,8 +454,7 @@ export default function MintPage() {
             args: [BigInt(tierIndex)]
           }) as bigint;
           
-          // Formula: requiredWei = feePerSub * qty * 1e24 / ethPrice
-          // feePerSub is tierPriceCents (e.g. 450)
+          console.log("Tier Price Cents:", tierPriceCents.toString());
           
           // 3. Get Oracle Price
           const oracleAddress = await publicClient.readContract({
@@ -420,12 +470,20 @@ export default function MintPage() {
           }) as [bigint, bigint, bigint, bigint, bigint];
 
           const ethPriceUSD = answer; // 8 decimals
+          console.log("ETH Price USD (8 dec):", ethPriceUSD.toString());
 
           // Calculate
           // requiredWei = feePerSub * qty * 1e24 / ethPrice
+          // This formula works if feePerSub is in cents (2 decimals) and ethPrice is 8 decimals
+          // Example: $4.50 (450) * 1e24 = 450 * 10^24
+          // ETH $3000 (3000 * 10^8)
+          // Result: 450 * 10^24 / 3000 * 10^8 = 0.15 * 10^16 = 1.5 * 10^15 = 0.0015 ETH ($4.50)
+          
           const totalFee = tierPriceCents * BigInt(quantity);
           valueToSend = (totalFee * BigInt(1e24)) / ethPriceUSD;
           
+          console.log("Calculated Value to Send (Wei):", valueToSend.toString());
+
           // Add small buffer (+0.001 ETH = 1e15 wei)
           valueToSend = valueToSend + BigInt(1e15);
 
