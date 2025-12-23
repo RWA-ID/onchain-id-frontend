@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useAccount, useGasPrice, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount } from "wagmi";
 import { useLocation } from "wouter";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ethers } from "ethers";
 import { 
   Bot, 
   Server, 
@@ -19,7 +20,7 @@ import {
   Crown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createPublicClient, http, formatUnits, formatEther, formatGwei, custom } from "viem";
+import { createPublicClient, http, formatEther, custom } from "viem";
 import { mainnet } from "viem/chains";
 
 import {
@@ -54,8 +55,6 @@ const ZONE_ICONS: Record<string, any> = {
   "vehicle-id.eth": Car
 };
 
-const BASE_GAS = BigInt(100000);
-const GAS_PER_UNIT = BigInt(45000); 
 
 // Public Resolver Address (from user provided info)
 const RESOLVER_ADDRESS = "0xF29100983E058B709F3D539b0c765937B804AC15";
@@ -148,11 +147,11 @@ export default function MintPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastMintedTx, setLastMintedTx] = useState<string>("");
 
-  const { data: gasPrice } = useGasPrice({ chainId: 1 });
-  const { writeContract, data: hash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  // Transaction State (replacing wagmi hooks)
+  const [isPending, setIsPending] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [estimatedGasFee, setEstimatedGasFee] = useState<string>("");
+  const [estimatedGasFeeUsd, setEstimatedGasFeeUsd] = useState<string>("");
 
   // Fetch Parents (Zones)
   useEffect(() => {
@@ -337,16 +336,6 @@ export default function MintPage() {
     }
   }, [mintMode, singleName, parsedData]);
 
-  // Effect for Transaction Success
-  useEffect(() => {
-    if (isConfirmed && hash) {
-      setLastMintedTx(hash);
-      setShowSuccessModal(true);
-      
-      // Reset form but keep quantity context for the success message until closed
-      if (mintMode === "single") setSingleName("");
-    }
-  }, [isConfirmed, hash, mintMode]);
 
   // Fetch ETH Price
   useEffect(() => {
@@ -401,177 +390,256 @@ export default function MintPage() {
     }
   };
 
-  // Handle Approval
+  // Handle Approval (using ethers.js)
   const handleApprove = async () => {
-    if (!address) return;
+    if (!address || !window.ethereum) return;
     try {
-      const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
-      const publicClient = createPublicClient({ chain: mainnet, transport });
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
+      const signer = provider.getSigner();
       
-      const nameWrapperAddress = await publicClient.readContract({
-        address: CONTRACT_ADDRESS as `0x${string}`,
-        abi: ABI,
-        functionName: 'nameWrapper'
-      }) as `0x${string}`;
-
-      writeContract({
-        address: nameWrapperAddress,
-        abi: NAME_WRAPPER_ABI,
-        functionName: 'setApprovalForAll',
-        args: [CONTRACT_ADDRESS as `0x${string}`, true]
+      const registrarContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+      const nameWrapperAddress = await registrarContract.nameWrapper();
+      
+      const nameWrapper = new ethers.Contract(nameWrapperAddress, NAME_WRAPPER_ABI, signer);
+      const tx = await nameWrapper.setApprovalForAll(CONTRACT_ADDRESS, true);
+      await tx.wait();
+      
+      setApprovalNeeded(false);
+      toast({
+        title: "Approval Granted",
+        description: "You can now mint subdomains.",
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error("Approval failed", e);
+      toast({
+        title: "Approval Failed",
+        description: e.reason || e.message || "Failed to grant approval.",
+        variant: "destructive"
+      });
     }
   };
 
-  // Handle Buy License
+  // Handle Buy License (using ethers.js)
   const handleBuyLicense = async () => {
-    if (!selectedZone || !address) return;
-    // For now, assume a fixed price logic or fetch if needed
-    // User said: licensePriceUSD = 100000 * 1e8 (100000 cents? no. $1000?)
-    // "licensePriceUSD = 100000 * 1e8 with oracle 8 decimals" -> 100000e8 usually means units?
-    // Wait, 100000 cents? $1000. 
-    // Let's rely on standard payable logic if needed, but for now just call without value unless revert?
-    // Actually, user said "send enough ETH". We should calculate similarly.
-    // For this mockup, let's trigger the transaction and let user see wallet prompt/estimate.
-    // Ideally we calculate using same logic as minting.
+    if (!selectedZone || !address || !window.ethereum) return;
     
-    // Simplification for now: Trigger buyLicense, wallet handles value if estimate works?
-    // No, msg.value must be set.
-    
-    // Use simplified flow for now (mockup mode limitations on precise Oracle reads without caching).
-    // Let's assume user just wants to see the button work.
-    
-    writeContract({
-        address: CONTRACT_ADDRESS as `0x${string}`,
-        abi: ABI,
-        functionName: 'buyLicense',
-        args: [selectedZone],
-        value: BigInt(0) // Ideally calculate this
-    });
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
+      const signer = provider.getSigner();
+      const registrar = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      
+      // Calculate license price
+      const licensePriceUSD = await registrar.licensePriceUSD();
+      const oracleAddress = await registrar.oracle();
+      const oracleContract = new ethers.Contract(oracleAddress, CHAINLINK_ABI, provider);
+      const roundData = await oracleContract.latestRoundData();
+      const ethPriceUSD = roundData[1];
+      
+      const multiplier = ethers.BigNumber.from("1000000000000000000000000"); // 1e24
+      let valueToSend = licensePriceUSD.mul(multiplier).div(ethPriceUSD);
+      valueToSend = valueToSend.add(ethers.BigNumber.from("1000000000000000")); // buffer
+      
+      const tx = await registrar.buyLicense(selectedZone.replace('.eth', ''), { value: valueToSend });
+      await tx.wait();
+      
+      setHasLicense(true);
+      toast({
+        title: "License Purchased",
+        description: "You now have unlimited minting for this namespace.",
+      });
+    } catch (e: any) {
+      console.error("License purchase failed", e);
+      toast({
+        title: "Purchase Failed",
+        description: e.reason || e.message || "Failed to purchase license.",
+        variant: "destructive"
+      });
+    }
   };
 
-  // Handle Mint Action
+  // Handle Mint Action with ethers.js for proper transaction building
   const handleMint = async () => {
     if (selectedZone === null || !address) return;
+    if (!window.ethereum) {
+      toast({
+        title: "Wallet Not Found",
+        description: "Please install MetaMask or another Web3 wallet.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    // Use current ETH quote for payment value
-    const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
-    const publicClient = createPublicClient({ chain: mainnet, transport });
-    
-    // Calculate price in ETH
-    let valueToSend = BigInt(0);
-    
-    if (!hasLicense) {
+    setIsPending(true);
+    setEstimatedGasFee("");
+    setEstimatedGasFeeUsd("");
+
+    try {
+      // 1. Get Web3Provider and verify network
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const { chainId } = await provider.getNetwork();
+      
+      if (chainId !== 1) {
+        toast({
+          title: "Wrong Network",
+          description: "Please switch to Ethereum Mainnet to mint.",
+          variant: "destructive"
+        });
+        setIsPending(false);
+        return;
+      }
+
+      // 2. Calculate value to send
+      let valueToSend = ethers.BigNumber.from(0);
+      
+      if (!hasLicense) {
         try {
-          // 1. Determine Tier Index
-          // <=10 => tier0, <=50 => tier1, else tier2
+          const registrarContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+          
+          // Determine Tier Index
           let tierIndex = 2;
           if (quantity <= 10) tierIndex = 0;
           else if (quantity <= 50) tierIndex = 1;
           
-          // 2. Get Tier Price (cents)
-          const tierPriceCents = await publicClient.readContract({
-            address: CONTRACT_ADDRESS as `0x${string}`,
-            abi: ABI,
-            functionName: 'tierPricesUSD',
-            args: [BigInt(tierIndex)]
-          }) as bigint;
-          
+          // Get Tier Price (cents)
+          const tierPriceCents = await registrarContract.tierPricesUSD(tierIndex);
           console.log("Tier Price Cents:", tierPriceCents.toString());
           
-          // 3. Get Oracle Price
-          const oracleAddress = await publicClient.readContract({
-            address: CONTRACT_ADDRESS as `0x${string}`,
-            abi: ABI,
-            functionName: 'oracle'
-          }) as `0x${string}`;
-
-          const [, answer, , , ] = await publicClient.readContract({
-            address: oracleAddress,
-            abi: CHAINLINK_ABI,
-            functionName: 'latestRoundData'
-          }) as [bigint, bigint, bigint, bigint, bigint];
-
-          const ethPriceUSD = answer; // 8 decimals
+          // Get Oracle Price
+          const oracleAddress = await registrarContract.oracle();
+          const oracleContract = new ethers.Contract(oracleAddress, CHAINLINK_ABI, provider);
+          const roundData = await oracleContract.latestRoundData();
+          const ethPriceUSD = roundData[1]; // answer is at index 1
           console.log("ETH Price USD (8 dec):", ethPriceUSD.toString());
 
-          // Calculate
-          // requiredWei = feePerSub * qty * 1e24 / ethPrice
-          // This formula works if feePerSub is in cents (2 decimals) and ethPrice is 8 decimals
-          // Example: $4.50 (450) * 1e24 = 450 * 10^24
-          // ETH $3000 (3000 * 10^8)
-          // Result: 450 * 10^24 / 3000 * 10^8 = 0.15 * 10^16 = 1.5 * 10^15 = 0.0015 ETH ($4.50)
-          
-          const totalFee = tierPriceCents * BigInt(quantity);
-          valueToSend = (totalFee * BigInt(1e24)) / ethPriceUSD;
+          // Calculate: requiredWei = feePerSub * qty * 1e24 / ethPrice
+          const totalFee = tierPriceCents.mul(quantity);
+          const multiplier = ethers.BigNumber.from("1000000000000000000000000"); // 1e24
+          valueToSend = totalFee.mul(multiplier).div(ethPriceUSD);
           
           console.log("Calculated Value to Send (Wei):", valueToSend.toString());
 
           // Add small buffer (+0.001 ETH = 1e15 wei)
-          valueToSend = valueToSend + BigInt(1e15);
+          valueToSend = valueToSend.add(ethers.BigNumber.from("1000000000000000")); // 1e15
 
         } catch (e) {
           console.error("Price calc failed, using fallback", e);
           
           // Fallback Calculation
-          // Assume $4.50 (450 cents) per unit if tiered fetch fails
-          // Assume ETH = $3000 (3000 * 1e8)
-          
-          const fallbackPriceCents = BigInt(450); // Tier 0 price
-          const fallbackEthPrice = BigInt(3000 * 1e8); 
-          
-          const totalFee = fallbackPriceCents * BigInt(quantity);
-          // Wei = (cents * 1e18) / (eth_price_cents??) no.
-          // Wei = (totalCents * 1e18) / (ETH_USD * 100) -> 
-          
-          // Let's stick to the formula: feePerSub * qty * 1e24 / ethPrice
-          // feePerSub = 450
-          // ethPrice = 3000 * 1e8
-          
-          valueToSend = (totalFee * BigInt(1e24)) / fallbackEthPrice;
-          valueToSend = valueToSend + BigInt(1e15);
+          const fallbackPriceCents = ethers.BigNumber.from(450);
+          const fallbackEthPrice = ethers.BigNumber.from("300000000000"); // 3000 * 1e8
+          const totalFee = fallbackPriceCents.mul(quantity);
+          const multiplier = ethers.BigNumber.from("1000000000000000000000000");
+          valueToSend = totalFee.mul(multiplier).div(fallbackEthPrice);
+          valueToSend = valueToSend.add(ethers.BigNumber.from("1000000000000000"));
         }
-    }
+      }
 
-
-    // Extract just the label part (e.g., "drone-id" from "drone-id.eth")
-    // The contract expects the parent label without .eth suffix
-    const parentLabel = selectedZone.replace('.eth', '');
-
-    if (mintMode === "single") {
-        if (!singleName.trim()) return;
-        
-        writeContract({
-          address: CONTRACT_ADDRESS as `0x${string}`,
-          abi: ABI,
-          functionName: 'registerBulk',
-          args: [
-            parentLabel,          // parentLabel (without .eth)
-            [singleName],         // labels
-            address,              // to
-            RESOLVER_ADDRESS as `0x${string}`, // resolver
-            BigInt(0)             // ttl
-          ],
-          value: valueToSend
+      // 3. Extract parent label (without .eth)
+      const parentLabel = selectedZone.replace('.eth', '');
+      const labels = mintMode === "single" ? [singleName.trim()] : (parsedData?.labels || []);
+      
+      if (labels.length === 0 || (mintMode === "single" && !singleName.trim())) {
+        toast({
+          title: "No Labels",
+          description: "Please enter a name to register.",
+          variant: "destructive"
         });
-    } else {
-        if (!parsedData) return;
+        setIsPending(false);
+        return;
+      }
 
-        writeContract({
-          address: CONTRACT_ADDRESS as `0x${string}`,
-          abi: ABI,
-          functionName: 'registerBulk',
-          args: [
-            parentLabel,            // parentLabel (without .eth)
-            parsedData.labels,      // labels
-            address,                // to
-            RESOLVER_ADDRESS as `0x${string}`, // resolver
-            BigInt(0)               // ttl
-          ],
-          value: valueToSend
+      // 4. Create contract instance with signer
+      const registrar = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      // 5. Build transaction via populateTransaction
+      const txReq = await registrar.populateTransaction.registerBulk(
+        parentLabel,
+        labels,
+        address,
+        RESOLVER_ADDRESS,
+        0, // ttl
+        { value: valueToSend }
+      );
+      txReq.from = await signer.getAddress();
+
+      // 6. Estimate gas and get fee data
+      const gasLimit = await signer.estimateGas(txReq);
+      txReq.gasLimit = gasLimit;
+
+      const feeData = await provider.getFeeData();
+      if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+        txReq.maxFeePerGas = feeData.maxFeePerGas;
+        txReq.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+      } else if (feeData.gasPrice) {
+        txReq.gasPrice = feeData.gasPrice;
+      }
+
+      // Calculate estimated gas fee for UI display
+      const gasFeeWei = feeData.maxFeePerGas 
+        ? gasLimit.mul(feeData.maxFeePerGas) 
+        : gasLimit.mul(feeData.gasPrice || 0);
+      const gasFeeEth = ethers.utils.formatEther(gasFeeWei);
+      const gasFeeUsd = (parseFloat(gasFeeEth) * ethPrice).toFixed(2);
+      setEstimatedGasFee(parseFloat(gasFeeEth).toFixed(6));
+      setEstimatedGasFeeUsd(gasFeeUsd);
+
+      console.log("Gas Limit:", gasLimit.toString());
+      console.log("Estimated Gas Fee (ETH):", gasFeeEth);
+
+      // 7. Run simulation before sending (verifies transaction will succeed)
+      try {
+        await provider.call({ ...txReq, from: txReq.from });
+        console.log("Transaction simulation successful");
+      } catch (simError: any) {
+        console.error("Transaction simulation failed:", simError);
+        toast({
+          title: "Transaction Would Fail",
+          description: simError.reason || "The transaction would fail. Please check your inputs.",
+          variant: "destructive"
         });
+        setIsPending(false);
+        return;
+      }
+
+      // 8. Send transaction using signer
+      const tx = await signer.sendTransaction(txReq);
+      console.log("Transaction sent:", tx.hash);
+      
+      setIsPending(false);
+      setIsConfirming(true);
+
+      // 9. Wait for confirmation
+      const receipt = await tx.wait();
+      console.log("Transaction confirmed:", receipt);
+
+      setIsConfirming(false);
+      setLastMintedTx(tx.hash);
+      setShowSuccessModal(true);
+      
+      // Reset form
+      if (mintMode === "single") setSingleName("");
+
+    } catch (error: any) {
+      console.error("Mint failed:", error);
+      setIsPending(false);
+      setIsConfirming(false);
+      
+      // Handle user rejection
+      if (error.code === 4001 || error.code === "ACTION_REJECTED") {
+        toast({
+          title: "Transaction Rejected",
+          description: "You rejected the transaction in your wallet.",
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "Mint Failed",
+          description: error.reason || error.message || "An error occurred while minting.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -618,10 +686,6 @@ export default function MintPage() {
     fetchQuote();
   }, [selectedZone, quantity, hasLicense]);
 
-  // Gas Estimation
-  const estimatedGas = gasPrice ? (BASE_GAS + (GAS_PER_UNIT * BigInt(quantity))) * gasPrice : BigInt(0);
-  const estimatedGasEth = parseFloat(formatEther(estimatedGas));
-  const estimatedGasUsd = estimatedGasEth * ethPrice;
 
   // Render Logic
   if (!isConnected) {
@@ -991,11 +1055,15 @@ export default function MintPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400 text-sm flex items-center gap-2">
                       <Fuel className="w-4 h-4" />
-                      Est. Gas
+                      Est. Network Fee
                     </span>
                     <div className="text-right">
-                       <span className="font-mono text-slate-300 block">{estimatedGasEth.toFixed(5)} ETH</span>
-                       <span className="font-mono text-xs text-slate-500">≈ ${estimatedGasUsd.toFixed(2)}</span>
+                       <span className="font-mono text-slate-300 block">
+                         {estimatedGasFee ? `${estimatedGasFee} ETH` : "Calculated on mint"}
+                       </span>
+                       {estimatedGasFeeUsd && (
+                         <span className="font-mono text-xs text-slate-500">≈ ${estimatedGasFeeUsd}</span>
+                       )}
                     </div>
                   </div>
                 </div>
@@ -1007,11 +1075,14 @@ export default function MintPage() {
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="text-lg font-bold">Total Estimate</span>
                     <span className="text-3xl font-display font-bold">
-                      {isCalculating ? "..." : (hasLicense ? estimatedGasUsd : quoteETH + estimatedGasUsd).toFixed(2)}
+                      {isCalculating ? "..." : hasLicense 
+                        ? (estimatedGasFeeUsd ? `${parseFloat(estimatedGasFeeUsd).toFixed(2)}` : "Gas only")
+                        : `${(quoteETH + (estimatedGasFeeUsd ? parseFloat(estimatedGasFeeUsd) : 0)).toFixed(2)}`
+                      }
                       <span className="text-sm font-normal text-slate-400 ml-2">USD</span>
                     </span>
                   </div>
-                  <p className="text-right text-xs text-slate-500">Includes Gas + Mint Fees</p>
+                  <p className="text-right text-xs text-slate-500">Includes Network Fee + Mint Cost</p>
                 </div>
 
                 {/* Action Button */}
