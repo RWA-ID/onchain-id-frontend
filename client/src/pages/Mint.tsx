@@ -567,38 +567,22 @@ export default function MintPage() {
       );
       txReq.from = await signer.getAddress();
 
-      // 6. Get fee data for EIP-1559
-      const feeData = await provider.getFeeData();
-      if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
-        txReq.maxFeePerGas = feeData.maxFeePerGas;
-        txReq.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-      } else if (feeData.gasPrice) {
-        txReq.gasPrice = feeData.gasPrice;
-      }
-
-      // 7. Try to estimate gas, but don't block if it fails (wallet will handle it)
+      // 6. Let the wallet handle gas settings - it knows current network conditions best
+      // Don't override maxFeePerGas/gasPrice - wallet will set optimal values
+      
+      // 7. Try to estimate gas for a tighter gas limit
       try {
         const gasLimit = await signer.estimateGas(txReq);
-        txReq.gasLimit = gasLimit;
-        
-        // Calculate estimated gas fee for UI display
-        const gasFeeWei = feeData.maxFeePerGas 
-          ? gasLimit.mul(feeData.maxFeePerGas) 
-          : gasLimit.mul(feeData.gasPrice || 0);
-        const gasFeeEth = ethers.utils.formatEther(gasFeeWei);
-        const gasFeeUsd = (parseFloat(gasFeeEth) * ethPrice).toFixed(2);
-        setEstimatedGasFee(parseFloat(gasFeeEth).toFixed(6));
-        setEstimatedGasFeeUsd(gasFeeUsd);
-        console.log("Gas Limit:", gasLimit.toString());
-        console.log("Estimated Gas Fee (ETH):", gasFeeEth);
+        // Add 20% buffer to estimated gas
+        txReq.gasLimit = gasLimit.mul(120).div(100);
+        console.log("Estimated Gas Limit:", gasLimit.toString());
       } catch (gasError) {
-        // Gas estimation failed (likely insufficient funds for simulation)
-        // Set a reasonable default and let the wallet handle it
-        console.log("Gas estimation failed, using default. Wallet will show actual cost.");
-        txReq.gasLimit = ethers.BigNumber.from(300000); // reasonable default for registerBulk
+        // Gas estimation failed, use reasonable default
+        console.log("Gas estimation failed, using default.");
+        txReq.gasLimit = ethers.BigNumber.from(250000);
       }
 
-      // 8. Send transaction - let the wallet prompt the user with actual cost
+      // 8. Send transaction - wallet will show actual network fee
       const tx = await signer.sendTransaction(txReq);
       console.log("Transaction sent:", tx.hash);
       
