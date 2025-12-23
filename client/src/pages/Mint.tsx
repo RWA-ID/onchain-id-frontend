@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { useLocation } from "wouter";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ethers } from "ethers";
@@ -70,7 +70,8 @@ const getUrlParams = () => {
 };
 
 export default function MintPage() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, connector } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   
@@ -460,10 +461,12 @@ export default function MintPage() {
   // Handle Mint Action with ethers.js for proper transaction building
   const handleMint = async () => {
     if (selectedZone === null || !address) return;
-    if (!window.ethereum) {
+    
+    // Get provider from the connected wallet via wagmi connector
+    if (!connector) {
       toast({
-        title: "Wallet Not Found",
-        description: "Please install MetaMask or another Web3 wallet.",
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet first.",
         variant: "destructive"
       });
       return;
@@ -474,9 +477,9 @@ export default function MintPage() {
     setEstimatedGasFeeUsd("");
 
     try {
-      // 1. Get Web3Provider and verify network
-      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-      await provider.send("eth_requestAccounts", []);
+      // 1. Get provider from the connected wagmi connector
+      const walletProvider = await connector.getProvider();
+      const provider = new ethers.providers.Web3Provider(walletProvider as any);
       const signer = provider.getSigner();
       const { chainId } = await provider.getNetwork();
       
