@@ -11,12 +11,16 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Home from "@/pages/Home";
 import MintPage from "@/pages/Mint";
+import AboutUs from "@/pages/AboutUs";
+import UseCases from "@/pages/UseCases";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/mint" component={MintPage} />
+      <Route path="/aboutus" component={AboutUs} />
+      <Route path="/usecases" component={UseCases} />
       <Route component={NotFound} />
     </Switch>
   );

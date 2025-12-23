@@ -9,17 +9,13 @@ export function Navbar() {
   const [location] = useLocation();
 
   const links = [
-    { href: "#about", label: "About" },
-    { href: "#use-cases", label: "Use Cases" },
+    { href: "/aboutus", label: "About" },
+    { href: "/usecases", label: "Use Cases" },
   ];
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
-    e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsOpen(false);
-    }
+    // Standard navigation now, no scroll hijack needed for these pages
+    setIsOpen(false);
   };
 
   return (
@@ -37,14 +33,13 @@ export function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
-              onClick={(e) => handleScroll(e, link.href)}
               className="text-sm font-medium transition-colors hover:text-primary cursor-pointer text-muted-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -73,14 +68,14 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
           {links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
-              onClick={(e) => handleScroll(e, link.href)}
+              onClick={() => setIsOpen(false)}
               className="text-lg font-medium cursor-pointer text-muted-foreground hover:text-primary"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <div className="h-px bg-border my-2" />
           <div className="flex justify-center">
