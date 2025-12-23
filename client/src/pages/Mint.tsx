@@ -518,6 +518,10 @@ export default function MintPage() {
     }
 
 
+    // Extract just the label part (e.g., "drone-id" from "drone-id.eth")
+    // The contract expects the parent label without .eth suffix
+    const parentLabel = selectedZone.replace('.eth', '');
+
     if (mintMode === "single") {
         if (!singleName.trim()) return;
         
@@ -526,7 +530,7 @@ export default function MintPage() {
           abi: ABI,
           functionName: 'registerBulk',
           args: [
-            selectedZone,         // parentLabel
+            parentLabel,          // parentLabel (without .eth)
             [singleName],         // labels
             address,              // to
             RESOLVER_ADDRESS as `0x${string}`, // resolver
@@ -542,7 +546,7 @@ export default function MintPage() {
           abi: ABI,
           functionName: 'registerBulk',
           args: [
-            selectedZone,           // parentLabel
+            parentLabel,            // parentLabel (without .eth)
             parsedData.labels,      // labels
             address,                // to
             RESOLVER_ADDRESS as `0x${string}`, // resolver
