@@ -822,7 +822,7 @@ export default function MintPage() {
               </CardHeader>
               <CardContent>
                 
-                <Tabs defaultValue="csv" className="w-full" onValueChange={(v) => setMintMode(v as "csv" | "single")}>
+                <Tabs value={mintMode} className="w-full" onValueChange={(v) => setMintMode(v as "csv" | "single")}>
                   <TabsList className="grid w-full grid-cols-2 mb-6">
                     <TabsTrigger value="csv" className="flex items-center gap-2">
                        <FileSpreadsheet className="w-4 h-4" />
