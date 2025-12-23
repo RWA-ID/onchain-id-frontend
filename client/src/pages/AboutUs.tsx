@@ -1,6 +1,7 @@
 import { Shield, Zap, Lock, Server, CheckCircle } from "lucide-react";
 
 export default function AboutUs() {
+  console.log("Rendering AboutUs Page");
   return (
     <div className="min-h-screen pt-20">
       <section className="py-24 bg-gray-50 border-b border-border relative">

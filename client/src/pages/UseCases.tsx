@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Factory, User, HeartPulse, Home as HomeIcon } from "lucide-react";
 
 export default function UseCases() {
+  console.log("Rendering UseCases Page");
   const cases = [
     {
       icon: Factory,
