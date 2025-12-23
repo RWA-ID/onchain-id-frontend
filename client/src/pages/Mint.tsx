@@ -60,21 +60,38 @@ const GAS_PER_UNIT = BigInt(45000);
 // Public Resolver Address (from user provided info)
 const RESOLVER_ADDRESS = "0xF29100983E058B709F3D539b0c765937B804AC15";
 
+// Read URL params immediately to get pending mint intent
+const getUrlParams = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  return {
+    action: searchParams.get("action"),
+    namespace: searchParams.get("namespace"),
+    label: searchParams.get("label")
+  };
+};
+
 export default function MintPage() {
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
-  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  
+  // Get initial URL params for pending mint intent
+  const initialParams = getUrlParams();
+  const [selectedZone, setSelectedZone] = useState<string | null>(initialParams.namespace);
   
   // License Modal State
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
+  
+  // Pending mint intent from URL (shown on connect screen)
+  const [pendingMintIntent, setPendingMintIntent] = useState<{namespace: string, label: string} | null>(
+    initialParams.namespace && initialParams.label 
+      ? { namespace: initialParams.namespace, label: initialParams.label }
+      : null
+  );
 
   // Check for license action or minting intent in URL
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const actionParam = searchParams.get("action");
-    const namespaceParam = searchParams.get("namespace");
-    const labelParam = searchParams.get("label");
+    const { action: actionParam, namespace: namespaceParam, label: labelParam } = getUrlParams();
     
     // Handle License Action
     if (actionParam === "license") {
@@ -88,6 +105,7 @@ export default function MintPage() {
         if (labelParam) {
             setMintMode("single");
             setSingleName(labelParam);
+            setPendingMintIntent({ namespace: namespaceParam, label: labelParam });
         }
     }
     
@@ -106,9 +124,9 @@ export default function MintPage() {
   const [checkingLicense, setCheckingLicense] = useState(false);
   const [approvalNeeded, setApprovalNeeded] = useState(false);
 
-  // Mint Mode State
-  const [mintMode, setMintMode] = useState<"csv" | "single">("csv");
-  const [singleName, setSingleName] = useState("");
+  // Mint Mode State - initialize based on URL params
+  const [mintMode, setMintMode] = useState<"csv" | "single">(initialParams.label ? "single" : "csv");
+  const [singleName, setSingleName] = useState(initialParams.label || "");
 
   const [file, setFile] = useState<File | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
@@ -607,16 +625,29 @@ export default function MintPage() {
 
   // Render Logic
   if (!isConnected) {
+    const IntentIcon = pendingMintIntent ? ZONE_ICONS[pendingMintIntent.namespace] || Bot : UploadCloud;
+    
     return (
       <div className="min-h-[80vh] flex items-center justify-center bg-gray-50/50">
         <Card className="w-full max-w-md border-primary/20 shadow-xl">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-              <UploadCloud className="w-8 h-8 text-primary" />
+              <IntentIcon className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-display">Connect to Mint</CardTitle>
+            <CardTitle className="text-2xl font-display">
+              {pendingMintIntent ? "Connect to Register" : "Connect to Mint"}
+            </CardTitle>
             <CardDescription className="text-lg">
-              Please connect your wallet to access the OEM minting dashboard.
+              {pendingMintIntent ? (
+                <span>
+                  Connect your wallet to register<br/>
+                  <span className="font-mono font-bold text-primary mt-2 inline-block text-xl">
+                    {pendingMintIntent.label}.{pendingMintIntent.namespace}
+                  </span>
+                </span>
+              ) : (
+                "Please connect your wallet to access the OEM minting dashboard."
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-8">
