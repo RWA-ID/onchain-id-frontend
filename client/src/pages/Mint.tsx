@@ -523,8 +523,8 @@ export default function MintPage() {
           
           console.log("Calculated Value to Send (Wei):", valueToSend.toString());
 
-          // Add small buffer (+0.001 ETH = 1e15 wei)
-          valueToSend = valueToSend.add(ethers.BigNumber.from("1000000000000000")); // 1e15
+          // Add tiny buffer (+0.0001 ETH = 1e14 wei) for rounding
+          valueToSend = valueToSend.add(ethers.BigNumber.from("100000000000000")); // 1e14
 
         } catch (e) {
           console.error("Price calc failed, using fallback", e);
@@ -535,7 +535,7 @@ export default function MintPage() {
           const totalFee = fallbackPriceCents.mul(quantity);
           const multiplier = ethers.BigNumber.from("1000000000000000000000000");
           valueToSend = totalFee.mul(multiplier).div(fallbackEthPrice);
-          valueToSend = valueToSend.add(ethers.BigNumber.from("1000000000000000"));
+          valueToSend = valueToSend.add(ethers.BigNumber.from("100000000000000")); // 1e14
         }
       }
 
@@ -567,10 +567,7 @@ export default function MintPage() {
       );
       txReq.from = await signer.getAddress();
 
-      // 6. Estimate gas and get fee data
-      const gasLimit = await signer.estimateGas(txReq);
-      txReq.gasLimit = gasLimit;
-
+      // 6. Get fee data for EIP-1559
       const feeData = await provider.getFeeData();
       if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
         txReq.maxFeePerGas = feeData.maxFeePerGas;
@@ -579,34 +576,29 @@ export default function MintPage() {
         txReq.gasPrice = feeData.gasPrice;
       }
 
-      // Calculate estimated gas fee for UI display
-      const gasFeeWei = feeData.maxFeePerGas 
-        ? gasLimit.mul(feeData.maxFeePerGas) 
-        : gasLimit.mul(feeData.gasPrice || 0);
-      const gasFeeEth = ethers.utils.formatEther(gasFeeWei);
-      const gasFeeUsd = (parseFloat(gasFeeEth) * ethPrice).toFixed(2);
-      setEstimatedGasFee(parseFloat(gasFeeEth).toFixed(6));
-      setEstimatedGasFeeUsd(gasFeeUsd);
-
-      console.log("Gas Limit:", gasLimit.toString());
-      console.log("Estimated Gas Fee (ETH):", gasFeeEth);
-
-      // 7. Run simulation before sending (verifies transaction will succeed)
+      // 7. Try to estimate gas, but don't block if it fails (wallet will handle it)
       try {
-        await provider.call({ ...txReq, from: txReq.from });
-        console.log("Transaction simulation successful");
-      } catch (simError: any) {
-        console.error("Transaction simulation failed:", simError);
-        toast({
-          title: "Transaction Would Fail",
-          description: simError.reason || "The transaction would fail. Please check your inputs.",
-          variant: "destructive"
-        });
-        setIsPending(false);
-        return;
+        const gasLimit = await signer.estimateGas(txReq);
+        txReq.gasLimit = gasLimit;
+        
+        // Calculate estimated gas fee for UI display
+        const gasFeeWei = feeData.maxFeePerGas 
+          ? gasLimit.mul(feeData.maxFeePerGas) 
+          : gasLimit.mul(feeData.gasPrice || 0);
+        const gasFeeEth = ethers.utils.formatEther(gasFeeWei);
+        const gasFeeUsd = (parseFloat(gasFeeEth) * ethPrice).toFixed(2);
+        setEstimatedGasFee(parseFloat(gasFeeEth).toFixed(6));
+        setEstimatedGasFeeUsd(gasFeeUsd);
+        console.log("Gas Limit:", gasLimit.toString());
+        console.log("Estimated Gas Fee (ETH):", gasFeeEth);
+      } catch (gasError) {
+        // Gas estimation failed (likely insufficient funds for simulation)
+        // Set a reasonable default and let the wallet handle it
+        console.log("Gas estimation failed, using default. Wallet will show actual cost.");
+        txReq.gasLimit = ethers.BigNumber.from(300000); // reasonable default for registerBulk
       }
 
-      // 8. Send transaction using signer
+      // 8. Send transaction - let the wallet prompt the user with actual cost
       const tx = await signer.sendTransaction(txReq);
       console.log("Transaction sent:", tx.hash);
       
