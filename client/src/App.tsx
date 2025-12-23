@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Home from "@/pages/Home";
 import MintPage from "@/pages/Mint";
 import AboutUs from "@/pages/AboutUs";
@@ -17,10 +18,10 @@ import UseCases from "@/pages/UseCases";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
       <Route path="/mint" component={MintPage} />
       <Route path="/aboutus" component={AboutUs} />
       <Route path="/usecases" component={UseCases} />
+      <Route path="/" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -32,12 +33,14 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme()}>
           <TooltipProvider>
-            <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
-              <Navbar />
-              <Router />
-              <Footer />
-              <Toaster />
-            </div>
+            <ErrorBoundary>
+              <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
+                <Navbar />
+                <Router />
+                <Footer />
+                <Toaster />
+              </div>
+            </ErrorBoundary>
           </TooltipProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
