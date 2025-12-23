@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useLocation } from "wouter";
 import { 
   Loader2, 
@@ -64,7 +65,20 @@ export function SubnameSearch() {
   const [status, setStatus] = useState<"idle" | "available" | "taken" | "invalid">("idle");
   const [_, setLocation] = useLocation();
   const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const { toast } = useToast();
+  
+  // Track pending registration intent after wallet connects
+  const pendingRegistration = useRef<{ namespace: string; label: string } | null>(null);
+  
+  // Effect to redirect after wallet connects if there's a pending registration
+  useEffect(() => {
+    if (isConnected && pendingRegistration.current) {
+      const { namespace: ns, label: lbl } = pendingRegistration.current;
+      pendingRegistration.current = null;
+      setLocation(`/mint?namespace=${ns}&label=${lbl}`);
+    }
+  }, [isConnected, setLocation]);
 
   const fullDomain = label ? `${label}.${namespace}` : `(name).${namespace}`;
 
@@ -135,23 +149,16 @@ export function SubnameSearch() {
 
   const handleRegister = () => {
     if (!isConnected) {
-        toast({
-            title: "Connect Wallet",
-            description: "Please connect your wallet to proceed with registration.",
-            variant: "default" // Or open modal? 
-            // The prompt says "If wallet not connected → prompt Connect Wallet"
-            // Since we are not inside a ConnectButton context here easily, 
-            // we might just redirect to /mint and pass params, letting /mint handle connection prompt?
-            // Or we can rely on the fact that /mint has a connect button.
-            // Let's redirect to /mint with query params.
-        });
-        // We will redirect anyway, and let the Mint page handle the "Connect" state if needed.
-        // Or we can invoke the connect modal if we had access to it.
-        // For now, redirecting to mint with prefilled data is best.
+      // Store the pending registration intent
+      pendingRegistration.current = { namespace, label };
+      // Open the RainbowKit connect modal
+      if (openConnectModal) {
+        openConnectModal();
+      }
+      return;
     }
     
-    // Pass data to mint page via URL state or query params
-    // Using query params for simplicity: ?namespace=...&label=...
+    // Already connected - redirect directly to mint page
     setLocation(`/mint?namespace=${namespace}&label=${label}`);
   };
 
