@@ -1,4 +1,6 @@
-import { Shield, Zap, Lock, Server } from "lucide-react";
+import { Shield, Zap, Lock, Server, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 
 export default function AboutUs() {
   return (
@@ -61,6 +63,27 @@ export default function AboutUs() {
                     <p className="text-muted-foreground text-sm">{item.text}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Cross-links */}
+              <div className="pt-8 border-t border-border">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link href="/usecases">
+                    <Button variant="outline" className="gap-2">
+                      Explore Use Cases <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/mint">
+                    <Button className="gap-2 bg-primary text-white hover:bg-primary/90">
+                      Start Minting <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/">
+                    <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                      Back to Onchain ID
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

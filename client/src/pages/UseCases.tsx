@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Factory, User, HeartPulse, Home as HomeIcon } from "lucide-react";
+import { Factory, User, HeartPulse, Home as HomeIcon, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 
 export default function UseCases() {
   const cases = [
@@ -74,6 +76,27 @@ export default function UseCases() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Cross-links */}
+          <div className="mt-16 pt-8 border-t border-border">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/aboutus">
+                <Button variant="outline" className="gap-2">
+                  Learn About Us <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="/mint">
+                <Button className="gap-2 bg-primary text-white hover:bg-primary/90">
+                  Start Minting <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="/">
+                <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+                  Back to Onchain ID
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
