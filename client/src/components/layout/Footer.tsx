@@ -36,11 +36,17 @@ export function Footer() {
               Connect
             </h4>
             <div className="flex gap-4">
-              <a href="https://x.com/onchain_id" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://x.com/onchain_id" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Twitter">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="https://github.com/onchain-idllc/onchain-id-protocol" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="GitHub">
                 <Github className="w-5 h-5" />
+              </a>
+              <a href="https://etherscan.io/address/0xf2D0f2057A1C5323015cF51baFCDf57293F86d04" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" title="Smart Contract on Etherscan">
+                <svg className="w-5 h-5" viewBox="0 0 293.775 293.667" fill="currentColor">
+                  <path d="M61.218,135.822a9.8,9.8,0,0,1,9.795-9.791l22.279.008a9.8,9.8,0,0,1,9.793,9.794l-.012,71.439a2.129,2.129,0,0,0,2.739,2.053,131.072,131.072,0,1,0-47.418,0,2.122,2.122,0,0,0,2.812-2.016Z"/>
+                  <path d="M147.112,96.217c32.7,0,59.2,26.5,59.2,59.2v45.932a2.127,2.127,0,0,0,3.062,1.909,131.2,131.2,0,1,0-124.513,0,2.127,2.127,0,0,0,3.062-1.909V155.42C88.016,122.714,114.408,96.217,147.112,96.217Z" fill="none" stroke="currentColor" strokeWidth="16"/>
+                </svg>
               </a>
             </div>
             <div className="mt-6">
