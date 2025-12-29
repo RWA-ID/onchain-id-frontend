@@ -43,6 +43,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { SubnameSearch } from "@/components/SubnameSearch";
 import { LicenseModal } from "@/components/LicenseModal";
@@ -98,19 +104,34 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm max-w-5xl mx-auto mb-16"
+              className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground leading-tight drop-shadow-sm max-w-5xl mx-auto"
             >
-              Decentralized Identity For <br />
+              Programmable Identity <br />
               <span className="text-primary">
-                Robots, Drones, Vehicles & Devices
+                Infrastructure
               </span>
             </motion.h1>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="space-y-3 max-w-2xl mx-auto"
+            >
+              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+                Onchain ID is the identity layer for robots, machines, devices, and fleets — verifiable onchain, interoperable by design.
+              </p>
+              <p className="text-lg text-muted-foreground/80">
+                Not custody. Not a wallet. Just naming + rights on Ethereum.
+              </p>
+            </motion.div>
 
             {/* Subname Search Component */}
             <motion.div
                initial={{ opacity: 0, y: 30 }}
                animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.8, delay: 0.3 }}
+               transition={{ duration: 0.8, delay: 0.4 }}
+               className="mt-8"
             >
                <SubnameSearch />
             </motion.div>
@@ -407,6 +428,124 @@ export default function Home() {
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* About Onchain ID Section */}
+      <section className="py-24 bg-white border-y border-border/40">
+        <div className="container px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">About Onchain ID</h2>
+              <p className="text-muted-foreground text-lg">
+                Enterprise-grade identity infrastructure for the autonomous economy.
+              </p>
+            </div>
+
+            <div className="space-y-6 text-muted-foreground leading-relaxed">
+              <p>
+                <strong className="text-foreground">Onchain ID is an identity layer built on Ethereum using ENS-based naming.</strong> We provide a standardized way to issue verifiable names (subdomains) for machines, devices, robots, fleets, environments, and teams.
+              </p>
+              <p>
+                <strong className="text-foreground">Onchain ID is not a custody provider and does not hold customer funds.</strong> OEMs and customers control wallets, keys, and operational policies. We provide the naming and rights infrastructure — nothing more.
+              </p>
+              <p>
+                <strong className="text-foreground">License ownership is onchain and verifiable.</strong> License holders can issue unlimited subdomains under their licensed namespace via the dashboard. Licenses are ERC-721 tokens that can be transferred, sold, or held as appreciating assets.
+              </p>
+              <p>
+                <strong className="text-foreground">Interoperable by design:</strong> names can be resolved across the Ethereum ecosystem and integrated into existing workflows. Any ENS-compatible resolver, wallet, or application can recognize Onchain ID subdomains.
+              </p>
+            </div>
+
+            {/* What This Is / What This Isn't */}
+            <div className="grid md:grid-cols-2 gap-8 mt-12">
+              <div className="p-6 bg-green-50 border border-green-200 rounded-xl">
+                <h3 className="font-display font-bold text-lg text-green-800 mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  What This Is
+                </h3>
+                <ul className="space-y-2 text-green-700">
+                  <li>• Identity + naming + onchain proof of rights</li>
+                  <li>• Issuance controls for OEMs and enterprises</li>
+                  <li>• Verifiable subdomain registration</li>
+                  <li>• Interoperable ENS-based infrastructure</li>
+                </ul>
+              </div>
+              <div className="p-6 bg-red-50 border border-red-200 rounded-xl">
+                <h3 className="font-display font-bold text-lg text-red-800 mb-4 flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  What This Isn't
+                </h3>
+                <ul className="space-y-2 text-red-700">
+                  <li>• Custody (we don't hold funds)</li>
+                  <li>• A payment processor</li>
+                  <li>• An OEM-specific closed system</li>
+                  <li>• A wallet or key management service</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 bg-slate-50 border-b border-border/40">
+        <div className="container px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Frequently Asked Questions</h2>
+              <p className="text-muted-foreground">
+                Common questions about Onchain ID and how it works.
+              </p>
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-4">
+              <AccordionItem value="what-is" className="bg-white border border-border rounded-lg px-6">
+                <AccordionTrigger className="text-left font-display font-semibold text-lg hover:no-underline">
+                  What is Onchain ID?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                  Onchain ID is a programmable identity layer for robots, machines, devices, and autonomous systems. It provides verifiable onchain identities powered by Ethereum and ENS-based naming, allowing manufacturers and operators to issue, manage, and verify machine identities at scale.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="custody" className="bg-white border border-border rounded-lg px-6">
+                <AccordionTrigger className="text-left font-display font-semibold text-lg hover:no-underline">
+                  Is this custody?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                  No. Onchain ID is not a custody provider and does not hold customer funds. OEMs and users control their own keys and wallets. We provide naming and identity infrastructure only — you maintain full control over your assets and operations.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="license" className="bg-white border border-border rounded-lg px-6">
+                <AccordionTrigger className="text-left font-display font-semibold text-lg hover:no-underline">
+                  Do I need a license?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                  License holders can issue unlimited subdomains under their licensed namespace with no per-subdomain fees. Non-holders can pay per subdomain with tiered pricing: $4.50 for 1-10 units, $3.00 for 11-50 units, and $1.50 for 51+ units. For high-volume issuers, the $99,000 unlimited license provides the best long-term value.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="how-it-works" className="bg-white border border-border rounded-lg px-6">
+                <AccordionTrigger className="text-left font-display font-semibold text-lg hover:no-underline">
+                  How does subdomain registration work?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                  Connect your wallet, select a namespace (robot-id.eth, drone-id.eth, etc.), enter a name or upload a CSV for bulk registration, and confirm the transaction. Your subdomains are minted as ENS names wrapped in the ENS NameWrapper contract, giving you full ownership and control.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="interoperability" className="bg-white border border-border rounded-lg px-6">
+                <AccordionTrigger className="text-left font-display font-semibold text-lg hover:no-underline">
+                  Are Onchain ID names interoperable?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                  Yes. Onchain ID names are standard ENS subdomains and can be resolved by any ENS-compatible application, wallet, or service. They work across the entire Ethereum ecosystem and can be integrated into existing workflows without custom infrastructure.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </div>
       </section>
     </div>
