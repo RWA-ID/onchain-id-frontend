@@ -118,10 +118,10 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="space-y-3 max-w-2xl mx-auto"
             >
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
+              <p className="text-xl md:text-2xl text-foreground/90 leading-relaxed font-medium">
                 Onchain ID is the identity layer for robots, machines, devices, and fleets — verifiable onchain, interoperable by design.
               </p>
-              <p className="text-lg text-muted-foreground/80">
+              <p className="text-lg text-foreground/70 font-medium">
                 Not custody. Not a wallet. Just naming + rights on Ethereum.
               </p>
             </motion.div>
@@ -175,17 +175,17 @@ export default function Home() {
                    </h3>
                    <div className="grid grid-cols-3 gap-4 ml-8">
                       <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
-                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 0 (Starter)</div>
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 1 (Starter)</div>
                         <div className="text-xl font-bold text-primary">$4.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
                         <div className="text-xs text-muted-foreground">1 - 10 Units</div>
                       </div>
                       <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
-                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 1 (Growth)</div>
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 2 (Growth)</div>
                         <div className="text-xl font-bold text-primary">$3.00 <span className="text-xs text-muted-foreground">/ ID</span></div>
                         <div className="text-xs text-muted-foreground">11 - 50 Units</div>
                       </div>
                       <div className="p-3 bg-white border border-border rounded-lg shadow-sm">
-                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 2 (Scale)</div>
+                        <div className="text-xs text-muted-foreground uppercase font-bold">Tier 3 (Volume)</div>
                         <div className="text-xl font-bold text-primary">$1.50 <span className="text-xs text-muted-foreground">/ ID</span></div>
                         <div className="text-xs text-muted-foreground">51+ Units</div>
                       </div>
