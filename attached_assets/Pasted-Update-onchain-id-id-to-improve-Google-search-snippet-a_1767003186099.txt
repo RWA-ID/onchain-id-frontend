@@ -1,0 +1,71 @@
+Update onchain-id.id to improve Google search snippet + add an OEM-focused “About” section.
+
+GOALS
+1) Ensure Google can generate a description/snippet for https://onchain-id.id by adding proper SEO tags in <head>.
+2) Make sure key homepage copy is server-rendered / present in the initial HTML (not injected only after JS/wallet connect).
+3) Add a new “About Onchain ID” section written for OEMs so they understand this is an identity layer (not custody, not a wallet, not a payment processor).
+
+TASKS
+
+A) SEO HEAD TAGS (Homepage)
+- Add/confirm these tags exist in the document head for the homepage:
+- <title>Onchain ID — Programmable Identity Infrastructure | Ethereum</title>
+- <meta name="description" content="Onchain ID is a programmable identity layer for robots, machines, devices, and autonomous systems. Issue verifiable onchain identities powered by Ethereum." />
+- <link rel="canonical" href="https://onchain-id.id/" />
+- Open Graph tags:
+- og:title, og:description, og:url, og:type=website
+- Twitter card tags:
+- twitter:card=summary_large_image, twitter:title, twitter:description
+- If the app is React/Next/Vite and head tags are currently missing, implement them correctly using:
+- Next.js: next/head or metadata API
+- React/Vite: react-helmet-async (preferred) or update index.html if static
+- IMPORTANT: The description must not be empty, duplicated site-wide, or shorter than ~120 characters.
+
+B) “VISIBLE TO GOOGLE” HOMEPAGE COPY
+- Ensure the hero headline + 2–3 lines of summary text are visible in the initial page HTML (or rendered immediately without requiring wallet connection).
+- Do NOT gate all content behind “Connect Wallet”.
+- Keep wallet connect as a CTA, but the page must include readable text about what Onchain ID is.
+
+Suggested hero copy:
+Headline: “Programmable Identity Infrastructure”
+Sub: “Onchain ID is the identity layer for robots, machines, devices, and fleets — verifiable onchain, interoperable by design.”
+Line 3: “Not custody. Not a wallet. Just naming + rights on Ethereum.”
+
+C) NEW “ABOUT” SECTION (OEM-FRIENDLY)
+Create a new section on the homepage (or /about route if the site has pages) titled:
+“About Onchain ID”
+
+Include this exact wording (edit only for formatting, not meaning):
+- Onchain ID is an identity layer built on Ethereum using ENS-based naming.
+- We provide a standardized way to issue verifiable names (subdomains) for machines, devices, robots, fleets, environments, and teams.
+- Onchain ID is not a custody provider and does not hold customer funds. OEMs and customers control wallets, keys, and operational policies.
+- License ownership is onchain and verifiable. License holders can issue unlimited subdomains under their licensed namespace via the dashboard.
+- Interoperable by design: names can be resolved across the Ethereum ecosystem and integrated into existing workflows.
+
+Add a short “What this is / What this isn’t” block:
+What this is:
+- Identity + naming + onchain proof of rights
+- Issuance controls for OEMs and enterprises
+What this isn’t:
+- Custody
+- A payment processor
+- An OEM-specific closed system
+
+D) SEARCH SNIPPET SUPPORT
+- Add a short FAQ accordion near the bottom:
+Q: “What is Onchain ID?”
+A: 1–2 sentences (match the meta description)
+Q: “Is this custody?”
+A: “No. OEMs and users control their own keys and wallets.”
+Q: “Do I need a license?”
+A: “License holders can issue unlimited subdomains; non-holders can pay per subdomain.”
+
+E) QUALITY CHECK
+- Confirm the homepage returns HTTP 200 on https://onchain-id.id/
+- Confirm view-source shows the title + meta description (or server-rendered equivalent).
+- After deploy, provide the exact URL path(s) changed and show the final title + meta description strings.
+
+IMPLEMENTATION NOTES
+- Keep design consistent with current style.
+- Don’t add heavy dependencies unless needed; if React, use react-helmet-async.
+- Keep the About section concise and enterprise-grade (no hype, no memes).
