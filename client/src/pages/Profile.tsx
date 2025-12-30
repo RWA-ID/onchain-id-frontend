@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { fetchProfileData, type ProfileData } from "@/lib/efp-api";
+import { fetchMintedSubnames, getParentName, type MintedSubname } from "@/lib/ensnode-api";
 
 // Social icon components (simple SVGs matching the screenshot style)
 const TwitterIcon = () => (
@@ -48,6 +49,10 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  
+  // Minted subnames state
+  const [mintedSubnames, setMintedSubnames] = useState<MintedSubname[]>([]);
+  const [isLoadingSubnames, setIsLoadingSubnames] = useState(false);
 
   // Fetch profile when address changes
   useEffect(() => {
@@ -73,6 +78,29 @@ export default function Profile() {
     };
 
     loadProfile();
+  }, [address]);
+
+  // Fetch minted subnames when address changes
+  useEffect(() => {
+    if (!address) {
+      setMintedSubnames([]);
+      return;
+    }
+
+    const loadSubnames = async () => {
+      setIsLoadingSubnames(true);
+      try {
+        const subnames = await fetchMintedSubnames(address);
+        console.log("Minted subnames fetched:", subnames);
+        setMintedSubnames(subnames);
+      } catch (err) {
+        console.error("Failed to fetch minted subnames:", err);
+      } finally {
+        setIsLoadingSubnames(false);
+      }
+    };
+
+    loadSubnames();
   }, [address]);
 
   // Copy address to clipboard
@@ -313,6 +341,51 @@ export default function Profile() {
               </div>
             )}
 
+          </CardContent>
+        </Card>
+
+        {/* Minted Onchain IDs Section */}
+        <Card className="border-border shadow-lg mt-6">
+          <CardHeader>
+            <CardTitle className="text-xl font-display">Your Onchain IDs</CardTitle>
+            <CardDescription>
+              Subnames you've minted through Onchain ID
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingSubnames ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : mintedSubnames.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">You haven't minted any Onchain IDs yet.</p>
+                <a href="/mint">
+                  <Button variant="outline" className="cursor-pointer">
+                    Mint Your First ID
+                  </Button>
+                </a>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {mintedSubnames.map((subname) => (
+                  <div 
+                    key={subname.name}
+                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100"
+                  >
+                    <div>
+                      <p className="font-mono font-medium text-slate-900">{subname.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {getParentName(subname.parentId)}
+                      </p>
+                    </div>
+                    <div className="text-right text-sm text-muted-foreground">
+                      {new Date(parseInt(subname.createdAt) * 1000).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
