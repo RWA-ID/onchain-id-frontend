@@ -14,11 +14,13 @@ import Home from "@/pages/Home";
 import MintPage from "@/pages/Mint";
 import AboutUs from "@/pages/AboutUs";
 import UseCases from "@/pages/UseCases";
+import Profile from "@/pages/Profile";
 
 function Router() {
   return (
     <Switch>
       <Route path="/mint" component={MintPage} />
+      <Route path="/profile" component={Profile} />
       <Route path="/aboutus" component={AboutUs} />
       <Route path="/usecases" component={UseCases} />
       <Route path="/" component={Home} />
