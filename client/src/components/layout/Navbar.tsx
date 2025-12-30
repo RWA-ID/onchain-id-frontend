@@ -1,14 +1,17 @@
 import { Link, useLocation } from "wouter";
-import { Cpu, Menu, X, Terminal } from "lucide-react";
+import { Cpu, Menu, X, Terminal, User } from "lucide-react";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
+  const { isConnected } = useAccount();
 
   const links = [
+    { href: "/", label: "Home" },
     { href: "/aboutus", label: "About" },
     { href: "/usecases", label: "Use Cases" },
   ];
@@ -20,8 +23,8 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors group cursor-pointer">
+      <div className="container mx-auto px-6 h-20 flex items-center justify-between relative">
+        <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors group cursor-pointer z-10">
           <div className="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/50 transition-colors">
             <Cpu className="w-5 h-5 text-primary" />
           </div>
@@ -30,8 +33,8 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop Nav - Centered */}
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -43,11 +46,19 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4 z-10">
           <Button variant="outline" className="font-mono text-xs h-9 border-primary/20 hover:border-primary/50 hover:bg-primary/5 hover:text-primary" disabled>
             <Terminal className="w-3 h-3 mr-2" />
             DOCS_V1 (SOON)
           </Button>
+          {isConnected && (
+            <Link href="/profile">
+              <Button variant="outline" className="font-mono text-xs h-9 border-primary/20 hover:border-primary/50 hover:bg-primary/5 hover:text-primary cursor-pointer">
+                <User className="w-3 h-3 mr-2" />
+                Profile
+              </Button>
+            </Link>
+          )}
           <ConnectButton 
             accountStatus="address" 
             chainStatus="icon"
@@ -77,6 +88,15 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {isConnected && (
+            <Link
+              href="/profile"
+              onClick={() => setIsOpen(false)}
+              className="text-lg font-medium cursor-pointer text-muted-foreground hover:text-primary"
+            >
+              Profile
+            </Link>
+          )}
           <div className="h-px bg-border my-2" />
           <div className="flex justify-center">
              <ConnectButton 
