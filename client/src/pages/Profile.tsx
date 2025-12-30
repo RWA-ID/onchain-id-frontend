@@ -4,7 +4,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { 
   User, 
   Loader2, 
-  ExternalLink,
   Mail,
   Copy,
   Check
@@ -12,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { fetchProfileData, type ProfileData } from "@/lib/efp-api";
 
 // Social icon components (simple SVGs matching the screenshot style)
@@ -41,6 +41,7 @@ const GitHubIcon = () => (
 
 export default function Profile() {
   const { address, isConnected } = useAccount();
+  const { toast } = useToast();
   
   // Profile data state
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -169,13 +170,23 @@ export default function Profile() {
     );
   }
 
+  // Get avatar URL - use ENS metadata service for reliable avatar resolution
+  const getAvatarUrl = () => {
+    if (profile?.ensName) {
+      // ENS metadata service resolves all avatar formats (IPFS, ERC721, direct URLs)
+      return `https://metadata.ens.domains/mainnet/avatar/${profile.ensName}`;
+    }
+    return profile?.avatar || null;
+  };
+  const avatarUrl = getAvatarUrl();
+
   // Social links array for rendering
   const socialLinks = [
-    { key: "twitter", value: profile?.twitter, icon: TwitterIcon, href: profile?.twitter ? `https://x.com/${profile.twitter}` : null, label: "X" },
-    { key: "github", value: profile?.twitter, icon: GitHubIcon, href: null, label: "GitHub" }, // No github in API, placeholder
-    { key: "telegram", value: profile?.telegram, icon: TelegramIcon, href: profile?.telegram ? `https://t.me/${profile.telegram}` : null, label: "Telegram" },
-    { key: "discord", value: profile?.discord, icon: DiscordIcon, href: null, label: "Discord" },
-    { key: "email", value: profile?.email, icon: Mail, href: profile?.email ? `mailto:${profile.email}` : null, label: "Email" },
+    { key: "twitter", value: profile?.twitter, icon: TwitterIcon, href: profile?.twitter ? `https://x.com/${profile.twitter}` : null, label: `@${profile?.twitter}` },
+    { key: "github", value: profile?.github, icon: GitHubIcon, href: profile?.github ? `https://github.com/${profile.github}` : null, label: profile?.github || "GitHub" },
+    { key: "telegram", value: profile?.telegram, icon: TelegramIcon, href: profile?.telegram ? `https://t.me/${profile.telegram}` : null, label: `@${profile?.telegram}` },
+    { key: "discord", value: profile?.discord, icon: DiscordIcon, href: null, label: profile?.discord || "Discord" },
+    { key: "email", value: profile?.email, icon: Mail, href: profile?.email ? `mailto:${profile.email}` : null, label: profile?.email || "Email" },
   ].filter(s => s.value);
 
   return (
@@ -183,23 +194,37 @@ export default function Profile() {
       <div className="max-w-3xl mx-auto">
         <Card className="border-border shadow-lg overflow-hidden">
           {/* Header background */}
-          <div className="h-32 bg-gradient-to-r from-slate-800 to-slate-900" />
+          {profile?.header ? (
+            <div className="h-32 bg-slate-800 overflow-hidden">
+              <img 
+                src={profile.header} 
+                alt="Header" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-32 bg-gradient-to-r from-slate-800 to-slate-900" />
+          )}
           
           <CardContent className="relative px-6 pb-8">
             {/* Avatar */}
             <div className="-mt-16 mb-4 flex items-end justify-between">
               <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-lg">
-                {profile?.avatar ? (
+                {avatarUrl ? (
                   <img 
-                    src={profile.avatar} 
-                    alt={profile.displayName || "Profile"} 
+                    src={avatarUrl} 
+                    alt={profile?.displayName || "Profile"} 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to default icon if image fails to load
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                    <User className="w-12 h-12 text-slate-400" />
-                  </div>
-                )}
+                ) : null}
+                <div className={`w-full h-full flex items-center justify-center bg-slate-100 ${avatarUrl ? 'hidden' : ''}`}>
+                  <User className="w-12 h-12 text-slate-400" />
+                </div>
               </div>
             </div>
 
@@ -221,16 +246,26 @@ export default function Profile() {
               </button>
             </div>
 
-            {/* Follower Stats */}
+            {/* Follower Stats - Link to EFP */}
             <div className="flex gap-6 mb-4">
-              <div className="flex items-center gap-1">
+              <a 
+                href={`https://efp.app/${profile?.ensName || address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:opacity-70 transition-opacity"
+              >
                 <span className="font-bold text-slate-900">{profile?.followingCount || 0}</span>
                 <span className="text-muted-foreground">Following</span>
-              </div>
-              <div className="flex items-center gap-1">
+              </a>
+              <a 
+                href={`https://efp.app/${profile?.ensName || address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:opacity-70 transition-opacity"
+              >
                 <span className="font-bold text-slate-900">{profile?.followersCount || 0}</span>
                 <span className="text-muted-foreground">Followers</span>
-              </div>
+              </a>
             </div>
 
             {/* Bio */}
@@ -257,30 +292,27 @@ export default function Profile() {
                       <Icon />
                     </a>
                   ) : (
-                    <div
+                    <button
                       key={social.key}
-                      className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
-                      title={`${social.label}: ${social.value}`}
+                      onClick={() => {
+                        if (social.value) {
+                          navigator.clipboard.writeText(String(social.value));
+                          toast({
+                            title: "Copied!",
+                            description: `${social.label} copied to clipboard`,
+                          });
+                        }
+                      }}
+                      className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                      title={`${social.label} (click to copy)`}
                     >
                       <Icon />
-                    </div>
+                    </button>
                   );
                 })}
               </div>
             )}
 
-            {/* Website */}
-            {profile?.website && (
-              <a
-                href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-primary hover:underline"
-              >
-                {profile.website.replace(/^https?:\/\//, '')}
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
           </CardContent>
         </Card>
       </div>

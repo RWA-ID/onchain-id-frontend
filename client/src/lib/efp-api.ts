@@ -68,10 +68,12 @@ export interface ProfileData {
   address: string;
   ensName: string | null;
   avatar: string | null;
+  header: string | null;
   displayName: string | null;
   bio: string | null;
   website: string | null;
   twitter: string | null;
+  github: string | null;
   discord: string | null;
   telegram: string | null;
   email: string | null;
@@ -97,10 +99,12 @@ export async function fetchProfileData(addressOrENS: string): Promise<ProfileDat
     address: account.address,
     ensName: ens?.name || null,
     avatar: ens?.avatar || records.avatar || null,
+    header: records.header || null,
     displayName: records.name || ens?.name || null,
     bio: records.description || null,
     website: records.url || null,
     twitter: records["com.twitter"] || null,
+    github: records["com.github"] || null,
     discord: records["com.discord"] || null,
     telegram: records["org.telegram"] || null,
     email: records.email || null,
