@@ -24,7 +24,7 @@ import {
   CheckCircle,
   FileSpreadsheet
 } from "lucide-react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import heroImage from "@assets/generated_images/pristine_high-tech_robot_factory_assembly_line_with_bright_lighting.png";
 
 const robotImage = "/assets/robot_id.png";
@@ -52,24 +52,19 @@ import {
 
 import { SubnameSearch } from "@/components/SubnameSearch";
 import { LicenseModal } from "@/components/LicenseModal";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export default function Home() {
   const [_, setLocation] = useLocation();
   const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
   const [licenseModalOpen, setLicenseModalOpen] = useState(false);
 
   const handleGetLicense = () => {
     if (isConnected) {
-      // If already connected, redirect to mint page with license action
       setLocation("/mint?action=license");
     } else {
-      // Set intent for after connection
       sessionStorage.setItem("connect_intent", "license");
-      if (openConnectModal) {
-        openConnectModal();
-      }
+      open();
     }
   };
 

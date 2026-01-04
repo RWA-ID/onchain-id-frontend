@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { useLocation } from "wouter";
 import { 
   Loader2, 
@@ -65,7 +65,7 @@ export function SubnameSearch() {
   const [status, setStatus] = useState<"idle" | "available" | "taken" | "invalid">("idle");
   const [_, setLocation] = useLocation();
   const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
   const { toast } = useToast();
   
   // Track pending registration intent after wallet connects
@@ -152,8 +152,8 @@ export function SubnameSearch() {
       // Store the pending registration intent
       pendingRegistration.current = { namespace, label };
       // Open the RainbowKit connect modal
-      if (openConnectModal) {
-        openConnectModal();
+      if (open) {
+        open();
       }
       return;
     }

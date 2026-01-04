@@ -3,7 +3,6 @@ import { Cpu, Menu, X, Terminal, User } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +16,6 @@ export function Navbar() {
   ];
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
-    // Standard navigation now, no scroll hijack needed for these pages
     setIsOpen(false);
   };
 
@@ -59,11 +57,7 @@ export function Navbar() {
               </Button>
             </Link>
           )}
-          <ConnectButton 
-            accountStatus="address" 
-            chainStatus="icon"
-            showBalance={false}
-          />
+          <appkit-button />
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -99,11 +93,7 @@ export function Navbar() {
           )}
           <div className="h-px bg-border my-2" />
           <div className="flex justify-center">
-             <ConnectButton 
-                accountStatus="address" 
-                chainStatus="icon"
-                showBalance={false}
-              />
+            <appkit-button />
           </div>
         </div>
       )}

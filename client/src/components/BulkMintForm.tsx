@@ -10,7 +10,6 @@ import { parseEther } from "viem";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { ABI } from "@/lib/abi";
 import { useToast } from "@/hooks/use-toast";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface CSVRow {
   name: string;
@@ -138,7 +137,7 @@ export function BulkMintForm() {
             </p>
           </div>
           <div className="pt-4">
-            <ConnectButton />
+            <appkit-button />
           </div>
         </CardContent>
       </Card>

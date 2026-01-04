@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
-import { useGasPrice } from "wagmi";
+import { useGasPrice, useAccount } from "wagmi";
 import { formatEther, formatUnits, formatGwei, createPublicClient, custom, http } from "viem";
 import { base } from "viem/chains";
 import { Button } from "@/components/ui/button";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,6 +31,8 @@ export function MintCalculator() {
   const [quoteUSDC, setQuoteUSDC] = useState<number>(0);
   
   const { data: gasPrice } = useGasPrice({ chainId: 8453 }); // Base Chain ID
+  const { isConnected } = useAccount();
+  const { open } = useAppKit();
 
   // Fetch ETH price from CoinGecko
   useEffect(() => {
@@ -238,61 +240,21 @@ export function MintCalculator() {
             </div>
 
             <div className="pt-6 border-t border-white/10">
-              <ConnectButton.Custom>
-                {({
-                  account,
-                  chain,
-                  openAccountModal,
-                  openChainModal,
-                  openConnectModal,
-                  authenticationStatus,
-                  mounted,
-                }) => {
-                  const ready = mounted && authenticationStatus !== 'loading';
-                  const connected =
-                    ready &&
-                    account &&
-                    chain &&
-                    (!authenticationStatus ||
-                      authenticationStatus === 'authenticated');
-
-                  return (
-                    <div
-                      className="w-full"
-                      {...(!ready && {
-                        'aria-hidden': true,
-                        'style': {
-                          opacity: 0,
-                          pointerEvents: 'none',
-                          userSelect: 'none',
-                        },
-                      })}
-                    >
-                      {(() => {
-                        if (!connected) {
-                          return (
-                            <Button 
-                              onClick={openConnectModal}
-                              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-md shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]"
-                            >
-                              Start Minting Now <ArrowRight className="ml-2 w-5 h-5" />
-                            </Button>
-                          );
-                        }
-                        
-                        return (
-                           <Button 
-                              disabled
-                              className="w-full h-12 bg-green-600 text-white font-bold text-lg rounded-md shadow-lg opacity-90 cursor-not-allowed"
-                            >
-                              Wallet Connected
-                            </Button>
-                        );
-                      })()}
-                    </div>
-                  );
-                }}
-              </ConnectButton.Custom>
+              {!isConnected ? (
+                <Button 
+                  onClick={() => open()}
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg rounded-md shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]"
+                >
+                  Start Minting Now <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              ) : (
+                <Button 
+                  disabled
+                  className="w-full h-12 bg-green-600 text-white font-bold text-lg rounded-md shadow-lg opacity-90 cursor-not-allowed"
+                >
+                  Wallet Connected
+                </Button>
+              )}
             </div>
           </div>
         </div>

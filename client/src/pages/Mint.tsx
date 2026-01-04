@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { useLocation } from "wouter";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ethers } from "ethers";
 import { 
   Bot, 
@@ -115,9 +114,15 @@ export default function MintPage() {
     }
   }, [isConnected]);
 
-  // Dynamic Parent Labels
-  const [availableZones, setAvailableZones] = useState<{name: string, label: string, icon: any}[]>([]);
-  const [isLoadingZones, setIsLoadingZones] = useState(true);
+  // Static zones - known namespaces (no need to fetch from contract since it always fails)
+  const availableZones = [
+    { name: "robot-id.eth", label: "robot-id", icon: ZONE_ICONS["robot-id.eth"] || Bot },
+    { name: "machine-id.eth", label: "machine-id", icon: ZONE_ICONS["machine-id.eth"] || Server },
+    { name: "device-id.eth", label: "device-id", icon: ZONE_ICONS["device-id.eth"] || Tablet },
+    { name: "drone-id.eth", label: "drone-id", icon: ZONE_ICONS["drone-id.eth"] || Plane },
+    { name: "vehicle-id.eth", label: "vehicle-id", icon: ZONE_ICONS["vehicle-id.eth"] || Car }
+  ];
+  const isLoadingZones = false;
 
   // License State
   const [hasLicense, setHasLicense] = useState(false);
@@ -154,107 +159,6 @@ export default function MintPage() {
   const [estimatedGasFee, setEstimatedGasFee] = useState<string>("");
   const [estimatedGasFeeUsd, setEstimatedGasFeeUsd] = useState<string>("");
 
-  // Fetch Parents (Zones)
-  useEffect(() => {
-    const fetchParents = async () => {
-      setIsLoadingZones(true);
-      try {
-        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
-        const publicClient = createPublicClient({ chain: mainnet, transport });
-        
-        let zones: { name: string; label: string; icon: any; }[] = [];
-        
-        try {
-            // Try fetching as array first
-            const parents = await publicClient.readContract({
-                address: CONTRACT_ADDRESS as `0x${string}`,
-                abi: ABI,
-                functionName: 'parents'
-            }) as string[];
-            
-            zones = parents.map(p => ({
-                name: p,
-                label: p.split('.')[0],
-                icon: ZONE_ICONS[p] || Bot
-            }));
-        } catch (e) {
-            console.log("Fetching parents() array failed, trying index...", e);
-            try {
-                // Try fetching by index
-                const fetchedZones: string[] = [];
-                let index = 0;
-                while (true) {
-                    try {
-                        const p = await publicClient.readContract({
-                            address: CONTRACT_ADDRESS as `0x${string}`,
-                            abi: ABI,
-                            functionName: 'parents',
-                            args: [BigInt(index)]
-                        }) as string;
-                        if (!p) break;
-                        fetchedZones.push(p);
-                        index++;
-                    } catch (err) {
-                        break; // Stop on error (likely out of bounds)
-                    }
-                }
-                
-                if (fetchedZones.length > 0) {
-                     zones = fetchedZones.map(p => ({
-                        name: p,
-                        label: p.split('.')[0],
-                        icon: ZONE_ICONS[p] || Bot
-                    }));
-                } else {
-                    throw new Error("No parents found by index");
-                }
-            } catch (fallbackError) {
-                console.error("All parent fetch methods failed", fallbackError);
-                // Fallback to hardcoded zones
-                const fallbackZones = [
-                  "robot-id.eth",
-                  "machine-id.eth",
-                  "device-id.eth",
-                  "drone-id.eth",
-                  "vehicle-id.eth"
-                ];
-                zones = fallbackZones.map(p => ({
-                  name: p,
-                  label: p.split('.')[0], 
-                  icon: ZONE_ICONS[p] || Bot
-                }));
-            }
-        }
-        
-        setAvailableZones(zones);
-        
-        // Auto select first if available
-        if (zones.length > 0 && !selectedZone) {
-             // Optional: setSelectedZone(zones[0].name);
-        }
-
-      } catch (e) {
-        console.error("Failed to fetch parents", e);
-        // Fallback to hardcoded zones if contract call fails
-        const fallbackZones = [
-          "robot-id.eth",
-          "machine-id.eth",
-          "device-id.eth",
-          "drone-id.eth",
-          "vehicle-id.eth"
-        ];
-        const zones = fallbackZones.map(p => ({
-          name: p,
-          label: p.split('.')[0], 
-          icon: ZONE_ICONS[p] || Bot
-        }));
-        setAvailableZones(zones);
-      } finally {
-        setIsLoadingZones(false);
-      }
-    };
-    fetchParents();
-  }, []);
 
   // Check License Ownership & Approval
   useEffect(() => {
@@ -694,7 +598,7 @@ export default function MintPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-8">
-            <ConnectButton />
+            <appkit-button />
           </CardContent>
         </Card>
       </div>

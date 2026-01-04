@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useLocation } from "wouter";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { createPublicClient, http, formatUnits, formatEther, custom } from "viem";
 import { mainnet } from "viem/chains";
 import { 

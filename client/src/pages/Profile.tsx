@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { 
   User, 
   Loader2, 
@@ -134,7 +133,7 @@ export default function Profile() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-8">
-            <ConnectButton />
+            <appkit-button />
           </CardContent>
         </Card>
       </div>

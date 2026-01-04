@@ -2,8 +2,9 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
-import { config } from "./lib/wagmi";
+import { wagmiAdapter, projectId, networks } from "./lib/wagmi";
+import { createAppKit } from "@reown/appkit/react";
+import { mainnet } from "@reown/appkit/networks";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -15,6 +16,27 @@ import MintPage from "@/pages/Mint";
 import AboutUs from "@/pages/AboutUs";
 import UseCases from "@/pages/UseCases";
 import Profile from "@/pages/Profile";
+
+const metadata = {
+  name: "Onchain ID",
+  description: "Programmable Identity Infrastructure for Robots, Machines, Devices & Fleets",
+  url: "https://onchain-id.id",
+  icons: ["https://onchain-id.id/favicon.png"]
+};
+
+createAppKit({
+  adapters: [wagmiAdapter],
+  projectId,
+  networks: [mainnet],
+  defaultNetwork: mainnet,
+  metadata,
+  features: {
+    email: true,
+    socials: ['google', 'x', 'github', 'discord', 'apple', 'farcaster'],
+    emailShowWallets: true
+  },
+  themeMode: 'light'
+});
 
 function Router() {
   return (
@@ -31,20 +53,18 @@ function Router() {
 
 function App() {
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>
-          <TooltipProvider>
-            <ErrorBoundary>
-              <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
-                <Navbar />
-                <Router />
-                <Footer />
-                <Toaster />
-              </div>
-            </ErrorBoundary>
-          </TooltipProvider>
-        </RainbowKitProvider>
+        <TooltipProvider>
+          <ErrorBoundary>
+            <div className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
+              <Navbar />
+              <Router />
+              <Footer />
+              <Toaster />
+            </div>
+          </ErrorBoundary>
+        </TooltipProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
