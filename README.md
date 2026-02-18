@@ -1,2 +1,9 @@
-# onchain-id-frontend
-Onchain ID Frontend Repo
+# Onchain ID Frontend
+
+Frontend for Onchain ID Protocol.
+
+Mainnet Registrar (v2):
+0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD
+
+Website: https://onchain-id.id  
+Contact: info@onchain-id.id
