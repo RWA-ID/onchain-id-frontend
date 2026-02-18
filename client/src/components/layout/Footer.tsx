@@ -48,7 +48,7 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://etherscan.io/address/0xf2D0f2057A1C5323015cF51baFCDf57293F86d04" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
+                <a href="https://etherscan.io/address/0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors flex items-center gap-2">
                   <EtherscanIcon className="w-4 h-4" />
                   Etherscan
                 </a>

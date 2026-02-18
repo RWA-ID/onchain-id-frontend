@@ -1,0 +1,54 @@
+Update the frontend to use the NEW Onchain ID mainnet SubnameRegistrar contract:
+
+NEW registrar (mainnet): 0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD
+
+The old address may still exist in the codebase (README, constants, env, config, or hardcoded in UI). Find ALL references to the old registrar address and replace them with the new one.
+
+Requirements:
+1) Centralize contract addresses:
+   - Create/confirm a single source of truth (e.g. src/config/contracts.ts or similar) with:
+     - MAINNET_REGISTRAR_ADDRESS = 0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD
+     - chainId mapping (1 for mainnet, optionally 8453 for Base if used)
+   - Ensure the UI uses the address from this config everywhere.
+
+2) ABI:
+   - Ensure the ABI used for SubnameRegistrar matches the verified mainnet contract.
+   - If the ABI is stored in /abi/SubnameRegistrar.json (or similar), confirm it includes functions used by the frontend:
+     - quoteBulk(...)
+     - registerBulk(...)
+     - buyLicense(...)
+     - hasLicense(...)
+     - setParentEnabled / parentEnabled (if used)
+   - Update the ABI file if needed.
+
+3) Quote + Pricing:
+   - Wherever the UI calls quoteBulk, make sure it reads and displays the returned requiredWei correctly.
+   - Convert requiredWei (wei) to ETH for display.
+   - If the UI previously computed price locally, keep it consistent with quoteBulk.
+
+4) Transactions:
+   - buyLicense: send exact msg.value required (from onchain quote / computed tier) and handle refund messaging.
+   - registerBulk: send msg.value = requiredWei (from quoteBulk) and handle success state.
+   - After tx confirms, refresh UI state (license status, balances, recent mints).
+
+5) Network handling:
+   - If user wallet is on the wrong network, show a clear “Switch to Ethereum Mainnet” prompt.
+   - Make sure the app uses chainId 1 for mainnet calls.
+   - Add a visible badge showing the connected network + contract address short form (0x912C…b8cD).
+
+6) Deployment sanity checks:
+   - Add a small “Contract Health” panel that fetches:
+     - payoutAddress()
+     - usdPerSub()
+     - parentEnabled(targetParent) (if applicable)
+     - and displays them so we can confirm the frontend is talking to the new contract.
+
+7) Testing:
+   - After changes, run the app and confirm:
+     - It connects on mainnet and reads license status.
+     - quoteBulk returns a non-zero requiredWei.
+     - registerBulk and buyLicense flows send transactions to 0x912C…b8cD.
+
+Deliverable:
+- Provide a short summary of all files changed and why.
+- Ensure there are no remaining references to the old registrar address.

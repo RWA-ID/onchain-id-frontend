@@ -1,13 +1,19 @@
 import { Link, useLocation } from "wouter";
-import { Cpu, Menu, X, Terminal, User } from "lucide-react";
+import { Cpu, Menu, X, Terminal, User, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CONTRACT_ADDRESS } from "@/lib/constants";
+
+const shortContract = `${CONTRACT_ADDRESS.slice(0, 6)}…${CONTRACT_ADDRESS.slice(-4)}`;
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
-  const { isConnected } = useAccount();
+  const { isConnected, chain } = useAccount();
+  const { switchChain } = useSwitchChain();
+  const isWrongNetwork = isConnected && chain?.id !== 1;
 
   const links = [
     { href: "/", label: "Home" },
@@ -45,6 +51,24 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-4 z-10">
+          {isConnected && (
+            <Badge variant="outline" className="font-mono text-[10px] h-7 border-primary/20 bg-primary/5 text-muted-foreground gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full ${isWrongNetwork ? 'bg-red-500' : 'bg-green-500'}`} />
+              {isWrongNetwork ? (chain?.name || 'Wrong Network') : 'Mainnet'}
+              <span className="text-primary/60">{shortContract}</span>
+            </Badge>
+          )}
+          {isWrongNetwork && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="font-mono text-xs h-7 gap-1"
+              onClick={() => switchChain({ chainId: 1 })}
+            >
+              <AlertTriangle className="w-3 h-3" />
+              Switch to Mainnet
+            </Button>
+          )}
           <Button variant="outline" className="font-mono text-xs h-9 border-primary/20 hover:border-primary/50 hover:bg-primary/5 hover:text-primary" disabled>
             <Terminal className="w-3 h-3 mr-2" />
             DOCS_V1 (SOON)

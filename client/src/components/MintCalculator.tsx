@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Calculator, DollarSign, Zap, Fuel, ArrowRight, Bot, Car, Plane, Server, Tablet, Globe } from "lucide-react";
 import { useGasPrice, useAccount } from "wagmi";
 import { formatEther, formatUnits, formatGwei, createPublicClient, custom, http } from "viem";
-import { base } from "viem/chains";
+import { mainnet } from "viem/chains";
 import { Button } from "@/components/ui/button";
 import { useAppKit } from "@reown/appkit/react";
 import { ABI } from "@/lib/abi";
@@ -50,34 +50,40 @@ export function MintCalculator() {
     fetchEthPrice();
   }, []);
 
-  // Fetch Price Quote from Contract using viem (direct RPC/Window)
+  const [quoteETH, setQuoteETH] = useState<number>(0);
+  
   useEffect(() => {
     async function fetchQuote() {
+      if (quantity === 0) { setQuoteUSDC(0); setQuoteETH(0); return; }
       try {
-        // Prefer window.ethereum if available, otherwise fallback to public RPC
-        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://mainnet.base.org");
-        
+        const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
         const publicClient = createPublicClient({
-          chain: base,
-          transport: transport
+          chain: mainnet,
+          transport
         });
 
-        const mintCostWei = await publicClient.readContract({
+        const zone = ZONES[selectedZone];
+        const parentLabel = zone.name.replace('.eth', '');
+        const caller = "0x0000000000000000000000000000000000000000";
+
+        const requiredWei = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'quoteUSDC',
-          args: [selectedZone, BigInt(quantity)]
+          functionName: 'quoteBulk',
+          args: [parentLabel, BigInt(quantity), caller as `0x${string}`]
         }) as bigint;
         
-        const mintCostUSDC = parseFloat(formatUnits(mintCostWei, 6)); // USDC uses 6 decimals
-        setQuoteUSDC(mintCostUSDC);
+        const ethAmount = parseFloat(formatEther(requiredWei));
+        setQuoteETH(ethAmount);
+        setQuoteUSDC(ethAmount * ethPrice);
       } catch (error) {
-        console.error("Error fetching quote:", error);
+        console.error("Error fetching quoteBulk:", error);
         setQuoteUSDC(0);
+        setQuoteETH(0);
       }
     }
     fetchQuote();
-  }, [selectedZone, quantity]);
+  }, [selectedZone, quantity, ethPrice]);
 
   const totalPriceUSDC = quoteUSDC;
   const unitPriceUSDC = quantity > 0 ? totalPriceUSDC / quantity : 0;

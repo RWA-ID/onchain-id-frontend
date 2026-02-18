@@ -4,7 +4,7 @@
 
 Onchain ID is a programmable identity infrastructure platform built on Ethereum, designed to provide verifiable onchain identities for robots, machines, devices, drones, and vehicles. The platform uses ENS (Ethereum Name Service) based naming to issue and manage decentralized identities, allowing manufacturers (OEMs) to register unique subdomains for their autonomous systems.
 
-The application enables bulk minting of machine identities, license purchases for namespace ownership, and integrates with Ethereum wallets via RainbowKit for Web3 interactions.
+The application enables bulk minting of machine identities, license purchases for namespace ownership, and integrates with Ethereum wallets via Reown AppKit for Web3 interactions (including social login via Google, X, GitHub, Discord, Apple, Farcaster).
 
 ## User Preferences
 
@@ -19,7 +19,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack React Query for server state, React hooks for local state
 - **Web3 Integration**: 
   - Wagmi for Ethereum interactions
-  - RainbowKit for wallet connection UI
+  - Reown AppKit for wallet connection UI (with social login)
   - Viem for low-level Ethereum utilities
 - **Animations**: Framer Motion for UI animations
 
@@ -36,12 +36,15 @@ Preferred communication style: Simple, everyday language.
 - **Current Storage**: In-memory storage implementation (`MemStorage` class) with interface for database migration
 
 ### Smart Contract Integration
-- **Contract Address**: `0xf2D0f2057A1C5323015cF51baFCDf57293F86d04`
+- **Contract Address**: `0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD`
 - **Network**: Ethereum Mainnet (with Base chain for gas calculations)
 - **Key Functions**: 
   - `buyLicense` - Purchase namespace licenses
   - `registerBulk` - Batch register subdomains
-  - `getQuoteUSDC` - Get pricing in USDC
+  - `quoteBulk` - Get pricing in Wei (replaces old getQuoteUSDC)
+  - `hasLicense` - Check if address has a license for a parent
+  - `usdPerSub` - Get USD price per subdomain
+  - `parentEnabled` - Check if a parent namespace is active
 - **Price Oracle**: Chainlink ETH/USD feed integration
 
 ### Project Structure
@@ -78,14 +81,14 @@ Preferred communication style: Simple, everyday language.
 
 ### Third-Party APIs
 - **CoinGecko API**: ETH price fetching for UI display
-- **WalletConnect**: Via RainbowKit project ID `56a7111a1e7b82e5cd75a7100fcd63a7`
+- **WalletConnect**: Via Reown AppKit project ID `56a7111a1e7b82e5cd75a7100fcd63a7`
 
 ### Database
 - **PostgreSQL**: Configured via `DATABASE_URL` environment variable
 - **Drizzle Kit**: Database migration tooling
 
 ### Key NPM Packages
-- `@rainbow-me/rainbowkit` - Wallet connection
+- `@reown/appkit` - Wallet connection with social login
 - `wagmi` / `viem` - Ethereum interactions
 - `drizzle-orm` - Database ORM
 - `framer-motion` - Animations

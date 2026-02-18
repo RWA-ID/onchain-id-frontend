@@ -50,6 +50,41 @@ export const ABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "string", "name": "parentLabel", "type": "string" },
+      { "internalType": "uint256", "name": "quantity", "type": "uint256" },
+      { "internalType": "address", "name": "caller", "type": "address" }
+    ],
+    "name": "quoteBulk",
+    "outputs": [{ "internalType": "uint256", "name": "requiredWei", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "string", "name": "parentLabel", "type": "string" }
+    ],
+    "name": "hasLicense",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "usdPerSub",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "string", "name": "parentLabel", "type": "string" }],
+    "name": "parentEnabled",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "nameWrapper",
     "outputs": [{ "internalType": "contract INameWrapper", "name": "", "type": "address" }],

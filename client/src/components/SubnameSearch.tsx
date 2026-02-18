@@ -151,7 +151,7 @@ export function SubnameSearch() {
     if (!isConnected) {
       // Store the pending registration intent
       pendingRegistration.current = { namespace, label };
-      // Open the RainbowKit connect modal
+      // Open the AppKit connect modal
       if (open) {
         open();
       }

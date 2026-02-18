@@ -44,6 +44,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ABI, NAME_WRAPPER_ABI, CHAINLINK_ABI } from "@/lib/abi";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { LicenseModal } from "@/components/LicenseModal";
+import { ContractHealth } from "@/components/ContractHealth";
 
 // Zone Definition with icon mapping
 const ZONE_ICONS: Record<string, any> = {
@@ -160,7 +161,7 @@ export default function MintPage() {
   const [estimatedGasFeeUsd, setEstimatedGasFeeUsd] = useState<string>("");
 
 
-  // Check License Ownership & Approval
+  // Check License Ownership & Approval using hasLicense()
   useEffect(() => {
     if (!address || !selectedZone) {
       setHasLicense(false);
@@ -173,39 +174,16 @@ export default function MintPage() {
         const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
         const publicClient = createPublicClient({ chain: mainnet, transport });
 
-        // 1. Check License Ownership (ERC721)
-        const balance = await publicClient.readContract({
+        const parentLabel = selectedZone.replace('.eth', '');
+
+        const licensed = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'balanceOf',
-          args: [address]
-        }) as bigint;
+          functionName: 'hasLicense',
+          args: [address, parentLabel]
+        }) as boolean;
+        setHasLicense(licensed);
 
-        let foundLicense = false;
-        for (let i = 0; i < Number(balance); i++) {
-            const tokenId = await publicClient.readContract({
-              address: CONTRACT_ADDRESS as `0x${string}`,
-              abi: ABI,
-              functionName: 'tokenOfOwnerByIndex',
-              args: [address, BigInt(i)]
-            }) as bigint;
-            
-            const parent = await publicClient.readContract({
-              address: CONTRACT_ADDRESS as `0x${string}`,
-              abi: ABI,
-              functionName: 'licenseParent',
-              args: [tokenId]
-            }) as string;
-
-            if (parent === selectedZone) {
-                foundLicense = true;
-                break;
-            }
-        }
-        setHasLicense(foundLicense);
-
-        // 2. Check NameWrapper Approval
-        // We need to find the NameWrapper address from the contract
         const nameWrapperAddress = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
@@ -397,49 +375,28 @@ export default function MintPage() {
         return;
       }
 
-      // 2. Calculate value to send
+      // 2. Get exact value from quoteBulk
       let valueToSend = ethers.BigNumber.from(0);
       
       if (!hasLicense) {
         try {
           const registrarContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+          const parentLabel = selectedZone.replace('.eth', '');
           
-          // Determine Tier Index
-          let tierIndex = 2;
-          if (quantity <= 10) tierIndex = 0;
-          else if (quantity <= 50) tierIndex = 1;
+          const requiredWei = await registrarContract.quoteBulk(parentLabel, quantity, address);
+          console.log("quoteBulk requiredWei:", requiredWei.toString());
           
-          // Get Tier Price (cents)
-          const tierPriceCents = await registrarContract.tierPricesUSD(tierIndex);
-          console.log("Tier Price Cents:", tierPriceCents.toString());
-          
-          // Get Oracle Price
-          const oracleAddress = await registrarContract.oracle();
-          const oracleContract = new ethers.Contract(oracleAddress, CHAINLINK_ABI, provider);
-          const roundData = await oracleContract.latestRoundData();
-          const ethPriceUSD = roundData[1]; // answer is at index 1
-          console.log("ETH Price USD (8 dec):", ethPriceUSD.toString());
-
-          // Calculate: requiredWei = feePerSub * qty * 1e24 / ethPrice
-          const totalFee = tierPriceCents.mul(quantity);
-          const multiplier = ethers.BigNumber.from("1000000000000000000000000"); // 1e24
-          valueToSend = totalFee.mul(multiplier).div(ethPriceUSD);
-          
-          console.log("Calculated Value to Send (Wei):", valueToSend.toString());
-
-          // Add tiny buffer (+0.0001 ETH = 1e14 wei) for rounding
-          valueToSend = valueToSend.add(ethers.BigNumber.from("100000000000000")); // 1e14
+          valueToSend = requiredWei;
 
         } catch (e) {
-          console.error("Price calc failed, using fallback", e);
+          console.error("quoteBulk failed, using fallback", e);
           
-          // Fallback Calculation
           const fallbackPriceCents = ethers.BigNumber.from(450);
-          const fallbackEthPrice = ethers.BigNumber.from("300000000000"); // 3000 * 1e8
+          const fallbackEthPrice = ethers.BigNumber.from("300000000000");
           const totalFee = fallbackPriceCents.mul(quantity);
           const multiplier = ethers.BigNumber.from("1000000000000000000000000");
           valueToSend = totalFee.mul(multiplier).div(fallbackEthPrice);
-          valueToSend = valueToSend.add(ethers.BigNumber.from("100000000000000")); // 1e14
+          valueToSend = valueToSend.add(ethers.BigNumber.from("100000000000000"));
         }
       }
 
@@ -526,15 +483,19 @@ export default function MintPage() {
     }
   };
 
-  // Fetch Quote for Display
+  // Fetch Quote using quoteBulk for accurate requiredWei
+  const [quoteWei, setQuoteWei] = useState<bigint>(BigInt(0));
+
   useEffect(() => {
     if (selectedZone === null || quantity === 0) {
       setQuoteETH(0);
+      setQuoteWei(BigInt(0));
       return;
     }
     
     if (hasLicense) {
         setQuoteETH(0);
+        setQuoteWei(BigInt(0));
         return;
     }
 
@@ -543,31 +504,28 @@ export default function MintPage() {
       try {
         const transport = window.ethereum ? custom(window.ethereum as any) : http("https://eth.merkle.io");
         const publicClient = createPublicClient({ chain: mainnet, transport });
+        const parentLabel = selectedZone.replace('.eth', '');
+        const caller = address || "0x0000000000000000000000000000000000000000";
 
-        // Get Tier Index
-        let tierIndex = 2;
-        if (quantity <= 10) tierIndex = 0;
-        else if (quantity <= 50) tierIndex = 1;
-
-        const tierPriceCents = await publicClient.readContract({
+        const requiredWei = await publicClient.readContract({
           address: CONTRACT_ADDRESS as `0x${string}`,
           abi: ABI,
-          functionName: 'tierPricesUSD',
-          args: [BigInt(tierIndex)]
+          functionName: 'quoteBulk',
+          args: [parentLabel, BigInt(quantity), caller as `0x${string}`]
         }) as bigint;
         
-        // Convert cents to USD dollars for display
-        const pricePerUnit = Number(tierPriceCents) / 100;
-        setQuoteETH(pricePerUnit * quantity);
+        setQuoteWei(requiredWei);
+        const ethAmount = Number(formatEther(requiredWei));
+        setQuoteETH(ethAmount);
         
       } catch (error) {
-        console.error("Quote error:", error);
+        console.error("quoteBulk error:", error);
       } finally {
         setIsCalculating(false);
       }
     };
     fetchQuote();
-  }, [selectedZone, quantity, hasLicense]);
+  }, [selectedZone, quantity, hasLicense, address]);
 
 
   // Render Logic
@@ -631,6 +589,8 @@ export default function MintPage() {
         </div>
 
         <LicenseModal open={licenseModalOpen} onOpenChange={setLicenseModalOpen} />
+
+        <ContractHealth />
 
         {/* Success Modal */}
         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
@@ -928,9 +888,14 @@ export default function MintPage() {
                       {isCalculating ? (
                         <Loader2 className="w-4 h-4 animate-spin ml-auto" />
                       ) : (
-                        <span className="font-mono font-bold">
-                            {hasLicense ? "FREE (License)" : `${quoteETH.toFixed(2)} USD`}
-                        </span>
+                        <>
+                          <span className="font-mono font-bold">
+                              {hasLicense ? "FREE (License)" : `${quoteETH.toFixed(6)} ETH`}
+                          </span>
+                          {!hasLicense && ethPrice > 0 && quoteETH > 0 && (
+                            <span className="font-mono text-xs text-slate-500 block">≈ ${(quoteETH * ethPrice).toFixed(2)}</span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -959,10 +924,11 @@ export default function MintPage() {
                     <span className="text-lg font-bold">Total Estimate</span>
                     <span className="text-3xl font-display font-bold">
                       {isCalculating ? "..." : hasLicense 
-                        ? (estimatedGasFeeUsd ? `${parseFloat(estimatedGasFeeUsd).toFixed(2)}` : "Gas only")
-                        : `${(quoteETH + (estimatedGasFeeUsd ? parseFloat(estimatedGasFeeUsd) : 0)).toFixed(2)}`
+                        ? (estimatedGasFeeUsd ? `$${parseFloat(estimatedGasFeeUsd).toFixed(2)}` : "Gas only")
+                        : ethPrice > 0 
+                          ? `$${(quoteETH * ethPrice + (estimatedGasFeeUsd ? parseFloat(estimatedGasFeeUsd) : 0)).toFixed(2)}`
+                          : `${quoteETH.toFixed(6)} ETH`
                       }
-                      <span className="text-sm font-normal text-slate-400 ml-2">USD</span>
                     </span>
                   </div>
                   <p className="text-right text-xs text-slate-500">Includes Network Fee + Mint Cost</p>
